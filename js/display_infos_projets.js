@@ -1,16 +1,13 @@
 function display_images() {
     var projects_first_div = document.querySelector('.content .images');
-    var projet = getProjet();
-    projetimages.forEach((project, index) => {
-        if (project.visible) {
-            project.images.forEach((img, imgIndex) => {
-                var imgElement = document.createElement('img');
-                imgElement.src = 'images/' + img;
-                imgElement.alt = 'Visuel et ' + projet.name;
-                imgElement.title = 'Visuel et ' + projet.name;
-                projects_first_div.appendChild(imgElement);
-            });
-        }
+    var project = getProjet();
+
+    project.images.forEach((img, imgIndex) => {
+        var imgElement = document.createElement('img');
+        imgElement.src = '/public/projets/' + img;
+        imgElement.alt = 'Visuel et ' + project.name;
+        imgElement.title = 'Visuel et ' + project.name;
+        projects_first_div.appendChild(imgElement);
     });
 }
 
@@ -18,7 +15,7 @@ function display_title() {
     var projet = getProjet();
     var titleElement = document.querySelector('h1');
     if (titleElement) {
-        titleElement.textContent = projet.name.replace(/-/g, ' ');
+        titleElement.textContent = projet.nom.replace(/-/g, ' ');
     }
 }
 
@@ -39,12 +36,14 @@ function display_technos() {
     var projet = getProjet();
     var technosDiv = document.querySelector('.technosProjet');
     projet.technos.forEach((techno) => {
-        var technoData = technos.find(t => t.name === techno);
+        var technoData = technos.find(t => {
+            return t.nom.toLowerCase() === techno.toLowerCase();
+        });
         if (technoData) {
             var technoDiv = document.createElement('div');
             technoDiv.className = 'technoProjet';
             var imgElement = document.createElement('img');
-            imgElement.src = 'images/' + technoData.infos.img;
+            imgElement.src = '/public/technos/' + technoData.img;
             imgElement.alt = 'Technologie utilisées';
             imgElement.title = 'Technologie utilisées';
             technoDiv.appendChild(imgElement);
@@ -53,9 +52,18 @@ function display_technos() {
     });
 }
 
+function display_description() {
+    var projet = getProjet();
+    var descriptionElement = document.querySelector('.description');
+    if (descriptionElement) {
+        descriptionElement.textContent = projet.description || 'Aucune description disponible pour ce projet.';
+    }
+}
+
 function getProjet() {
     var urlname = window.location.pathname.split('/')[window.location.pathname.split('/').length - 1];
-    var projet = projects.find(project => project.name === urlname);
+    var projet = projects.find(project => project.nom.replaceAll(' ', '-') === urlname.replaceAll(' ', '-'));
+    console.log(projet);
     if (!projet) {
         window.location.href = '/';
     }
@@ -66,3 +74,4 @@ display_images();
 display_title();
 display_link();
 display_technos();
+display_description();

@@ -46,7 +46,6 @@ function changeWave(){
         var interval = Math.floor(Math.random() * 3000) + 5000;
         var path = element.querySelector('path')
         path.style.transition = "all "+ interval +"ms ease-in-out 0s"
-        console.log(path.style.transition)
 
         updateWave(element, id)
 
@@ -58,7 +57,6 @@ function changeWave(){
 }
 
 function updateWave(element, id, path){
-    console.log('update')
     var random = Math.floor(Math.random() * choix.length);
     while(correspondance[id] == random){
         random = Math.floor(Math.random() * choix.length);
@@ -67,5 +65,4 @@ function updateWave(element, id, path){
     
     var newWave = choix[random];
     document.getElementById(id).querySelector('path').setAttribute('d', newWave);
-
 }

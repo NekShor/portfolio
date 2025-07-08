@@ -1,17 +1,8 @@
-function getParamsUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const paramsObj = {};
-    for (const [key, value] of params.entries()) {
-        paramsObj[key] = value;
-    }
-    return paramsObj;
-}
-
-// when load
 window.addEventListener('load', () => {
     var curriculumDiv = document.querySelectorAll('.curriculumDiv');
-    var params = getParamsUrl();
-    if (params.curriculum === 'true') {
+    var urlParams = window.location.href.split('/')[window.location.href.split('/').length - 1];
+
+    if (urlParams === 'cv') {
         curriculumDiv.forEach((element) => {
             element.style.display = 'block';
         });

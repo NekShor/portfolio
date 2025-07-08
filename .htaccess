@@ -1,5 +1,9 @@
 RewriteEngine On
 
+# Ne pas rediriger les images, styles et scripts
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|svg|webp|ico|pdf|ttf|woff|woff2)$ [NC]
+RewriteRule ^ - [L]
+
 # Redirige tout ce qui commence par /projet vers projet.html
 RewriteRule ^projet(/.*)?$ /projet.html [L]
 
@@ -8,5 +12,7 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Sinon, tout le reste vers index.html
+
+# Sinon, tout le reste vers index.html (sauf si c'est déjà index.html)
+RewriteCond %{REQUEST_URI} !^/index\.html$
 RewriteRule ^ index.html [L]

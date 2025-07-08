@@ -4,16 +4,19 @@ function display_projects() {
         var project_div = document.createElement('div');
         project_div.className = 'proj-g proj';
         project_div.style.backgroundImage = `url('public/projets/${project.images[0]}')`;
-        project_div.innerHTML = `<a title="Projet ${project.title}" href="${project.link}"><div><h3>${project.title}</h3></div></a>`;
+        var nom = (project.nom.substr(0, 1).toUpperCase() + project.nom.substr(1).toLowerCase()) || '';
+        project_div.innerHTML = `<a title="Projet ${nom}" href="/projet/${project.nom.replaceAll(' ', '-')}"><div><h3>${nom}</h3></div></a>`;
         projects_first_div.appendChild(project_div);
     });
     var projects_div = document.querySelector('.projets-p');
-    projects.forEach((project, index) => {
+    project = project_use.sort((a, b) => a.order - b.order);
+    project_use.forEach((project, index) => {
         if (!project.visible) return; 
         var project_div = document.createElement('div');
         project_div.className = 'proj-p proj';
         project_div.style.backgroundImage = `url('public/projets/${project.images[0]}')`;
-        project_div.innerHTML = `<a title="Projet ${project.title}" href="${project.link}"><div><h3>${project.title}</h3></div></a>`;
+        var nom = (project.nom.substr(0, 1).toUpperCase() + project.nom.substr(1).toLowerCase()) || '';
+        project_div.innerHTML = `<a title="Projet ${nom}" href="/projet/${project.nom.replaceAll(' ', '-')}"><div><h3>${nom}</h3></div></a>`;
         projects_div.appendChild(project_div);
     });
 }
@@ -33,7 +36,6 @@ function display_technos() {
             </div>
         `;
         technos_div.appendChild(techno_div);
-
     });
 }
 
@@ -44,6 +46,6 @@ function display_date(){
     footer.textContent = year;
 }
 
-display_projects();
-display_technos();
 display_date();
+display_technos();
+display_projects();
