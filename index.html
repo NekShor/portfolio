@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="css/admin.css">
+        <link rel="stylesheet" href="css/home.css">
+        <link rel="stylesheet" href="css/login.css">
+        <link rel="stylesheet" href="css/menu.css">
+        <link rel="stylesheet" href="css/projet.css">
+
+        <link rel="stylesheet" href="style/admin.css">
+        <link rel="stylesheet" href="style/app.css">
+        <link rel="stylesheet" href="style/bootstrap-tagsinput.css">
+        <link rel="stylesheet" href="style/menu.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="canonical" href="https://nekshor.fr/">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" media="screen" defer >
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous" async></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" media="screen" defer>
+
+
+        <link rel="preload" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />    
+        <!-- Primary Meta Tags -->
+        <title>NekShor - Antoine Bigot. Portfolio développement freelance</title>
+        <meta name="title" content="Portfolio Antoine Bigot">
+        <meta name="description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://nekshor.fr/">
+        <meta property="og:title" content="Portfolio">
+        <meta property="og:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+        <meta property="og:image" content="">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="https://nekshor.fr/">
+        <meta property="twitter:title" content="Portfolio">
+        <meta property="twitter:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+        <meta property="twitter:image" content="">
+        <meta name="google-site-verification" content="Y23QN_6NDC6LWrpV-DKURUVYKd4OB4g4IxvTelqmoFY" />
+        <meta name="robots" content="index, follow">
+    </head>
+    <body translate="no">
+        <div class="menu">
+            
+            <a href="/" title="Home NekShor" class="menu-logo">
+                <img src="img/logo-white.svg" alt="Logo NekShor" title="Logo NekShor">
+            </a>
+            <button onclick="openMenu()" class="menu-button">
+                <i class="material-icons" style="color: white;">menu</i>
+            </button>
+            <menu>
+                <li><a title="Home" href="/fr/"><i class="material-icons" style="font-size:35px;color: white;">home</i></a></li>
+                
+                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/fr/curriculum#curriculum">Curriculum</a></li>
+                    
+                <li><a title="Projets" href="/fr/#projets">Projets</a></li>
+                <li><a title="Compétences" href="/fr/#competences">Compétences</a></li>
+                
+                <li style="display: none;"><a title="parcours proffessionnel" href="/fr/curriculum#pro">Parcours</a></li>
+                <li><a title="Formulaire de contact" href="/fr/#contacts">Contact</a></li>
+            </menu>
+        </div>
+        <div class="content">
+            <div id="loader" style="position: fixed; top: 0; left: 0; width: 100vw; z-index:100000;">
+                <div id="contentLoader" style="height: 100vh; background-color: white;">
+                    <span class='h1'>NekShor<span> ...</span></span>
+                </div>
+                <svg id="visual7" class="waveSup" viewBox="0 0 1440 320" width="100%">
+                    <path d="M0 81L34.3 81.5C68.7 82 137.3 83 205.8 103.7C274.3 124.3 342.7 164.7 411.2 190.3C479.7 216 548.3 227 617 212.2C685.7 197.3 754.3 156.7 823 132.5C891.7 108.3 960.3 100.7 1028.8 85.8C1097.3 71 1165.7 49 1234.2 75.7C1302.7 102.3 1371.3 177.7 1405.7 215.3L1440 253L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="#ffffff" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                    </path>
+                </svg>
+            </div>
+            <div class="headerSubtitution"></div>
+            <div class="header">
+                <div class="text part">
+                    <h1 class="url"><a title="Site NekShor" href="/">nekshor.fr</a></h1>
+                    <h2 class="titre1">Hey,</h2>
+                    <h3 class="titre2">Je suis <span>Antoine Bigot</span></h3>
+                    <h4 class="titre3">Développeur Fullstack</h4>
+
+                    <p class="titre4">
+                        Bienvenue sur mon portfolio !
+                        Je suis ouvert à toutes propositions liées au 
+                        développement 
+                    </p>
+
+                </div>
+                <div class="pdp part">
+                    <img src="img/nekshortransparent.webp" title="Photo de profil NekShor - Antoine Bigot" alt="Photo de profil NekShor - Antoine Bigot">
+                </div>
+            </div>
+            <div class="header-wave" id="projets">
+                <svg id="visual1" class="waveSup" viewBox="0 0 1440 320" width="100%">
+                    <path d="M0 81L34.3 81.5C68.7 82 137.3 83 205.8 103.7C274.3 124.3 342.7 164.7 411.2 190.3C479.7 216 548.3 227 617 212.2C685.7 197.3 754.3 156.7 823 132.5C891.7 108.3 960.3 100.7 1028.8 85.8C1097.3 71 1165.7 49 1234.2 75.7C1302.7 102.3 1371.3 177.7 1405.7 215.3L1440 253L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="ffffff" fill-opacity="0.4" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                    </path>
+                </svg>
+                <svg id="visual2" class="waveSup" viewBox="0 0 1440 320" width="100%">
+                    <path d="M0 220L34.3 217.3C68.7 214.7 137.3 209.3 205.8 202.8C274.3 196.3 342.7 188.7 411.2 196C479.7 203.3 548.3 225.7 617 210.5C685.7 195.3 754.3 142.7 823 112.3C891.7 82 960.3 74 1028.8 86.5C1097.3 99 1165.7 132 1234.2 166.2C1302.7 200.3 1371.3 235.7 1405.7 253.3L1440 271L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="ffffff" fill-opacity="0.2" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                    </path>
+                </svg>
+                <svg id="visual3" class="waveSup waveWhite" viewBox="0 0 1440 320" width="100%">
+                    <path d="M0 217L34.3 192C68.7 167 137.3 117 205.8 125.3C274.3 133.7 342.7 200.3 411.2 194.3C479.7 188.3 548.3 109.7 617 111.7C685.7 113.7 754.3 196.3 823 232.2C891.7 268 960.3 257 1028.8 240.3C1097.3 223.7 1165.7 201.3 1234.2 173.3C1302.7 145.3 1371.3 111.7 1405.7 94.8L1440 78L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="#ffffff" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                    </path>
+                </svg>
+                <svg id="visual4" class="lastWave" viewBox="0 0 1440 320" width="100%">
+                    <path d="M0 254L34.3 256.7C68.7 259.3 137.3 264.7 205.8 233.5C274.3 202.3 342.7 134.7 411.2 129.8C479.7 125 548.3 183 617 176.7C685.7 170.3 754.3 99.7 823 80.5C891.7 61.3 960.3 93.7 1028.8 108.2C1097.3 122.7 1165.7 119.3 1234.2 114.8C1302.7 110.3 1371.3 104.7 1405.7 101.8L1440 99L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="ffffff" fill-opacity="0.3" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                    </path>
+                </svg>
+            </div>
+            <div class="cv curriculumDiv" style="display: none;">
+                <h2 class="h1" id="curriculum">Curriculum Vitae</h2>
+
+                <div class="canva">
+                    <div class="preview">
+                        <div style="position: relative; width: 100%; height: 0; padding-top: 141.4286%;
+                        padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+                        border-radius: 8px; will-change: transform;">
+                        <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                            src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFDwDBsYdw&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                        </iframe>
+                        </div>
+                        <button id="downloadCv" class="btn btn-primary" onclick="download()">Télécharger</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="projets">
+                <h2 class="h1">Mes projets</h2>
+                <p class="texteDescriptif">
+                    Explorez ci-dessous une sélection de mes projets passionnants, où chaque image vous ouvre les portes vers une expérience unique.
+                </p>
+                <div class="projets-g projets-f">
+                </div>
+                <div class="projets-p projets-f">
+                </div>
+            </div>
+
+            <div class="techno">
+                <div class="wave">
+                    <svg id="visual5" class="lastWave" viewBox="0 0 1440 320" width="100%">
+                        <path d="M0 254L34.3 256.7C68.7 259.3 137.3 264.7 205.8 233.5C274.3 202.3 342.7 134.7 411.2 129.8C479.7 125 548.3 183 617 176.7C685.7 170.3 754.3 99.7 823 80.5C891.7 61.3 960.3 93.7 1028.8 108.2C1097.3 122.7 1165.7 119.3 1234.2 114.8C1302.7 110.3 1371.3 104.7 1405.7 101.8L1440 99L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="#ffffff" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                        </path>
+                    </svg>
+                </div>
+                <div id="competences" class="background">
+                    <h2 >Ayez une idée de mes compétences</h2>
+                    <p class="texteDescriptif">
+                        Découvrez un aperçu de mes compétences et expertises dans le domaine de la technologie grâce à la sélection ci-dessous. (les étoiles ne servent que d'indication pour comparer mon niveau d'une technologie à l'autre)
+                    </p>
+                    <div class="liste">
+                    </div>
+                    <br><br><br>
+                </div>
+                <div id="contacts" class="wave">
+                    <svg id="visual6" class="lastWave" viewBox="0 0 1440 320" width="100%">
+                        <path d="M0 254L34.3 256.7C68.7 259.3 137.3 264.7 205.8 233.5C274.3 202.3 342.7 134.7 411.2 129.8C479.7 125 548.3 183 617 176.7C685.7 170.3 754.3 99.7 823 80.5C891.7 61.3 960.3 93.7 1028.8 108.2C1097.3 122.7 1165.7 119.3 1234.2 114.8C1302.7 110.3 1371.3 104.7 1405.7 101.8L1440 99L1440 321L1405.7 321C1371.3 321 1302.7 321 1234.2 321C1165.7 321 1097.3 321 1028.8 321C960.3 321 891.7 321 823 321C754.3 321 685.7 321 617 321C548.3 321 479.7 321 411.2 321C342.7 321 274.3 321 205.8 321C137.3 321 68.7 321 34.3 321L0 321Z" fill="#ffffff" stroke-linecap="round" stroke-linejoin="miter" style="transition: all 4s ease-in-out 0s;">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="sep">
+            </div>
+            <!--<div class="professionnel">
+                <h2 class="h1" id="pro">Mon parcours</h2>
+                <p class="texteDescriptif">
+                    Voici la liste de mes expériences professionnelles !
+                </p>
+                <div class="pro">
+
+                    {% for probloc in pros %}
+                        <div class="annee">
+                            {{probloc[0].debut}}
+                        </div>
+                        <div class="flex-pro">
+                            {% for pro in probloc %}
+                                <a title="Lien vers l'entreprise {{pro.titre}}" class="urlProfe type{{pro.type}}" href="{{pro.url}}">
+                                    <div class="profe">
+                                        <div class="info">
+                                            <h3>{{ pro.titre }}</h3>
+                                            <h4>{{ pro.entreprise }}</h4>
+                                            <p>{{ pro.description }}</p>
+                                        </div>
+                                        <div class="img" style="background-image: url('{{pro.logo}}');">
+                                        </div>
+                                    </div>
+                                </a>
+
+                                {# if the element is the last #}
+                                {% if loop.last %}
+                                {% else %}
+                                    
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% if pros[loop.index] is defined %}
+                            {% if pros[loop.index][0].debut != probloc[0].fin %}
+                                <div class="annee">
+                                    {{probloc[0].fin}}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+
+                    {% endfor %}
+
+                </div>
+
+            </div>-->
+
+            <!--<div class="formulaire">
+                <h2 class="h1" >Contact</h2>
+                <p class="texteDescriptif">
+                    Si vous avez une question ou que mon site vous à séduis, n'hésitez pas à me contacter !
+                </p>
+            {{ form_start(form) }}
+                <div class="my-custom-class-for-errors">
+                    {{ form_errors(form) }}
+                </div>
+
+                {# Champ honeypot caché #}
+                <div class="name">
+                    {{ form_row(form.Name) }}
+                </div>
+
+                <div class="row">
+                    <div class="identite">
+                        {{ form_row(form.Nom) }}
+                        {{ form_row(form.Prenom) }}
+                    </div>
+                    <div class="email">
+                        {{ form_row(form.Email) }}
+                    </div>
+                    <div class="message">
+                        {{ form_row(form.Message) }}
+                    </div>
+                    <div class="submit">
+                        {{ form_row(form.Envoyer) }}
+                    </div>
+                </div>
+            {{ form_end(form) }}</div>-->
+
+            <!-- Contactez moi par mail ou sur linkedin -->
+            <div class="contact">
+                <h2 class="h1">Contactez-moi</h2>
+                <p class="texteDescriptif">
+                    Vous pouvez me contacter par mail ou sur LinkedIn pour toute question ou proposition de collaboration.
+                </p>
+                <div class="contact-links">
+                    <a title="Mon mail" href="mailto:antoine27bigot@gmail.com" class="contact-link">
+                        <i class="material-icons">mail</i>
+                        <span>
+                            antoine27bigot@gmail.com
+                        </span>
+                    </a>
+                    <a title="Mon linkedin" href="https://www.linkedin.com/in/antoinebigot/" class="contact-link">
+                        <img src="img/linkedin-black.svg" title="Icon Linkedin" alt="Icon Linkedin">
+                        <span>
+                            LinkedIn
+                        </span>
+                    </a>
+                    <a title="Mon téléphone" href="tel:+33 6 38 59 24 99" class="contact-link">
+                        <i class="material-icons">call</i>
+                        <span>
+                            06 38 59 24 99
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="wave-p">
+                    <div class="wave wave6">
+
+                    </div>
+                </div>
+                <div class="liens">
+                    <div class="phone">
+                        <i class="material-icons" style="font-size:35px;color: white;">call</i>
+                        <a title="Mon numéro" href="tel:+33 6 38 59 24 99">06 38 59 24 99</a>
+                    </div>
+                    <div class="email">
+                        <i class="material-icons" style="font-size:35px;color: white;">mail</i>
+                        <a title="Mon mail" href="mailto:antoine27bigot@gmail.com">antoine27bigot@gmail.com</a>
+                    </div>
+                    <div class="linkedin">
+                        <img src="img/linkedin.svg" style="height: 35px; width: 35px;" title="Icon Linkedin" alt="Icon Linkedin">
+                        <a title="Mon linkedin" href="https://www.linkedin.com/in/antoinebigot/">LinkedIn</a>
+                    </div>
+                    
+                </div>
+                <div class="wave-p">
+                    <div class="wave wave7">
+
+                    </div>
+                </div>
+                <div class="copyright">
+                    NekShor © 2022 - <span class="date"></span>
+                    <p class="partenaires">
+                        Voir aussi :
+                    </p>
+                    <div class="partenaireListe">
+                        <a title="Cv Antoine Bigot" href="https://nekshor.fr/fr/curriculum">Curriculum Vitae</a>
+                        <a title="Mon instagram" href="https://www.instagram.com/lord_ant1/">Instagram</a>
+                    </div>
+                    
+                    <div class="partenaireListe">
+                        <a href="https://portfolio.theodoric.fr">Theodoric.fr</a>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                window.addEventListener('load', function(){
+                    document.body.style.position = 'relative';
+                    var sep = document.querySelector('.sep');
+                    
+                    var textLoader = document.querySelector('#loader .h1');
+                    textLoader.style.opacity = "1";
+
+                    var div = document.querySelector('#loader');
+                        var imagestoload = document.querySelectorAll('img');
+                        var imagesloaded = 0;
+                        imagestoload.forEach(function(image){
+                            image.addEventListener('load', function(){
+                                imagesloaded++;
+                                if(imagesloaded === imagestoload.length){
+                                    div.style.opacity = "0";
+                                    removeLoader();
+                                }
+                            })
+                        })
+
+                    })
+                        
+                    setTimeout(function(){
+                        removeLoader()
+                    }, 2000)
+
+                    function removeLoader(){
+                        setTimeout(function(){
+                            
+                            var loader = document.querySelector('#loader');
+                            //slide up loader
+                            loader.style.top = "-150vh";
+
+
+                            setTimeout(function(){
+                                document.body.style.position = 'relative';
+                                var wave = document.querySelector('.header-wave');
+                                wave.style.background = "none";
+                                loader.style.display = "none";
+                            }, 1500)
+
+                            //var div = document.querySelector('#loader');
+                            //div.style.display = "none";
+                        }, 500)
+                    }
+
+                    function download(){
+                        var pdf = 'https://nekshor.fr/images/CV_Antoine_Bigot.pdf';
+                        var a = document.createElement('a');
+                        a.href = pdf;
+                        a.download = 'CV_Antoine_Bigot.pdf';
+                        a.click();
+                    }
+
+                    var url = window.location.href;
+                    var downloadCv = document.querySelector('#downloadCv');
+                    if(downloadCv){
+                        downloadCv.addEventListener('click', function(){
+                            download();
+                        })
+                    }
+
+
+            </script>
+        </div>
+
+        <div class="errordiv" style="display: none;">
+            <h2>Erreur</h2>
+            <p>
+                Une erreur est survenue.
+            </p>
+        </div>
+
+        <script src="datas/projects.js"></script>
+        <script src="datas/technos.js"></script>
+
+        <script src="js/curriculum.js"></script>
+        <script src="js/menu.js"></script>
+        <script src="js/display_infos.js"></script>
+
+
+        <script defer src="https://www.googletagmanager.com/gtag/js?id=G-GXZ5X12191"></script>
+        <script async>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            });
+        });
+
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-GXZ5X12191');
+
+            function error(){
+                if(document.querySelector('.content').innerHTML === ""){
+                    document.querySelector('.errordiv').style.display = "flex";
+                    // no follow
+                    document.querySelector('meta[name="robots"]').content = "noindex, nofollow";
+                }
+            }
+
+            window.addEventListener('load', function(){
+                error()
+            })
+        </script>
+    </body>
+</html>

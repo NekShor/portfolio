@@ -1,0 +1,241 @@
+@font-face {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src : url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+}
+
+@font-face {
+    src:  url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&display=swap');
+    font-family: 'Assistant', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+
+}
+
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Material Icons'),
+      local('MaterialIcons-Regular'),
+      url('../font/MaterialIcons-Regular.ttf') format('truetype');
+    font-display: swap;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+  
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+  
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+  
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+  }
+
+html{
+    width: 100vw!important;
+    overflow-x: hidden;
+}
+
+body{
+    overflow-x: hidden;
+    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0; 
+    
+}
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+* {
+    scrollbar-width: auto;
+    scrollbar-color: #cfe0ff #ffffff;
+}
+
+  /* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #ffffff;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #cfe0ff;
+    border-radius: 10px;
+    border: 3px solid #ffffff;
+}
+
+a{
+    text-decoration: none!important;
+    color: white!important;
+
+}
+
+a:hover{
+    text-decoration: none!important;
+    color: white!important;
+}
+
+.menu{
+    width: 100vw;
+    height: 80px;
+    background: linear-gradient(to right, #CFE0FF, #8BD59E);
+    margin: 0; padding: 0;
+    float: right;
+    box-shadow: 0px 0px 30px #00000032;
+    position: fixed;
+    z-index: 10000;
+}
+
+menu{
+    height: 100%;
+    margin: 0; padding: 0;
+    display: flex;
+    justify-content: space-between;
+    float: right;
+    margin-right: 150px;
+    align-items: center;
+}
+
+.menu-button{
+    display: none;
+}
+
+menu li{
+    list-style-type: none;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    font-weight: 600;
+    font-size: 1.5vw;
+    margin: 0 25px;
+}
+
+menu li a{
+    color: white;
+}
+
+.menu-logo{
+    height: 80px;
+    width: 100px;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 150px;
+}
+
+.menu-logo img{
+    height: 65%;
+    aspect-ratio: 2/1;
+    object-fit: scale-down;
+}
+
+@media only screen and (max-width: 768px) {
+    * {
+        scrollbar-width: auto;
+        scrollbar-color: #cfe0ff #ffffff;
+    }
+    
+      /* Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+        width: 16px;
+    }
+    
+    *::-webkit-scrollbar-track {
+        background: #ffffff;
+    }
+    
+    *::-webkit-scrollbar-thumb {
+        background-color: #cfe0ff;
+        border-radius: 10px;
+        border: 3px solid #ffffff;
+    }
+
+    .menu{
+        height: 80px;
+        transition-duration: 0.3s;
+        overflow: hidden;
+    }
+
+    menu{
+        display: none;
+        flex-direction: column;
+        margin-right: 0!important;
+        width: 100%;
+
+    }
+
+    menu li:first-child{
+        display: none;
+    }
+    
+    menu li{
+        font-size: 3vh;
+        margin: 5px 0;
+        width: 100%;
+        text-align: center;
+        transition-duration: 0.3s;
+    }
+
+    .menu-button{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 50px;
+        height: 80px;
+        float: right;
+        background: transparent;
+        border: none;
+    }
+
+    .menu-button i{
+        font-size: 60px;
+    }
+
+    .menu-logo{
+        margin-left: 50px;
+    }
+
+    .menu-open menu{
+        display: block;
+    }
+
+    .menu-open {
+        height: 220px!important;
+    }
+}
+
+@media only screen and (max-width: 1200px) and (min-width: 768px) {
+    menu{
+        margin-right: 50px;
+    }
+
+    .menu-logo{
+        margin-left: 50px;
+    }
+
+    menu li{
+        font-size: 2.6vh;
+
+    }
+}

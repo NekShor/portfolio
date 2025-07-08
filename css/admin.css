@@ -1,0 +1,15 @@
+.conteiner{
+    width: 100vw;
+    height: 100vh;
+     
+    padding: 100px; 
+}
+
+.form-group [type=submit]{
+    background-color: #0d6efd;
+    color: white;
+}
+
+.sections{
+    margin-top: 100px!important;
+}

@@ -1,0 +1,23 @@
+.errordiv{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.errordiv h1,.errordiv p{
+    background: linear-gradient(to right, #a8c4f7, #8BD59E);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.errordiv h1{
+    font-size: 5em;
+}
+
+.errordiv p{
+    font-size: 3em;
+}

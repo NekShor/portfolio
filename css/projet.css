@@ -1,0 +1,175 @@
+body{
+    background: linear-gradient(to right, #CFE0FF, #8BD59E)!important;
+    min-height: 100vh;
+}
+
+.page{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+
+}
+
+.page .images{
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 100px;
+}
+
+
+.page .images img{
+    width: 100%;
+    height: auto;
+    margin: 10px 0px;
+
+}
+
+.page .text{
+    width: 60%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.page .fix{
+    position: fixed;
+    width: 40%;
+}
+
+.page .text .head{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10vh;
+    width: 120%;
+
+}
+
+.page .text .head h1{
+    font-size: 3.5vw;
+}
+
+.page .text .head h3{
+    font-size: 2.5vw;
+}
+
+.page .text .description{
+    min-height: 30vh;
+    max-height: 60vh;
+    overflow-y: scroll;
+    width: 120%;
+    font-size: 1.5vw;
+    margin-top: 30px;
+
+}
+
+.page .text .technosProjet{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.page .text .technosProjet .technoProjet{
+    margin: 5px;
+}
+
+.page .text .technosProjet .technoProjet img{
+    height: 40px;
+}
+
+
+@media only screen and (max-width: 768px) {
+    .page{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    
+    }
+
+    .page .images{
+        height: 60%;
+        width: 100vw;
+
+    }
+
+    .page .images img{
+        width: 80%;
+        height: auto;
+        margin: 10px 0px;
+    }
+
+    .page .text{
+        height: 40%;
+        width: 100vw;
+        position: fixed;
+        bottom: 0;
+        box-shadow: 0px 0px 30px #00000032;
+        z-index: 1000;
+        background: linear-gradient(to right, #CFE0FF, #8BD59E);
+    }
+    
+    .page .fix{
+        width: 90%;
+        height: 40%;
+
+    }
+
+    .page .text .head{
+        width: 100%;
+        margin-top: 1vh;
+
+    }
+
+    .page .text .head h1{
+        font-size: 9vw;
+    }
+    
+    .page .text .head h3{
+        font-size: 6vw;
+    }
+
+    .page .text .description{
+        width: 100%;
+        font-size: 3.5vw;
+        min-height: 5vh;
+        max-height: 15vh;
+        margin-top: 10px;
+    }
+    
+    .page .text .technosProjet .technoProjet img{
+        height: 30px;
+    }
+    
+    .page .text .technosProjet{
+        margin-top: 10px;
+    }
+
+}
+
+@media only screen and (max-width: 1200px) and (min-width: 768px)  {
+    .page .text .head h1{
+        font-size: 4vw;
+    }
+    
+    .page .text .head h3{
+        font-size: 3vw;
+    }
+
+    .page .text .description{
+        width: 100%;
+        font-size: 2vw;
+        min-height: 20vh;
+        max-height: 40vh;
+    }
+    
+}

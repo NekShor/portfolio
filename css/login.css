@@ -1,0 +1,21 @@
+.conteiner{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;    
+}
+
+.block-form{
+    width: 300px;
+}
+
+.form-group{
+    margin: 20px 0px;
+}
+
+.form-group [type=submit]{
+    background-color: #0d6efd;
+    color: white;
+}
