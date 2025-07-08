@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" href="css/admin.css">
+        <link rel="stylesheet" href="css/home.css">
+        <link rel="stylesheet" href="css/login.css">
+        <link rel="stylesheet" href="css/menu.css">
+        <link rel="stylesheet" href="css/projet.css">
+
+        <link rel="stylesheet" href="style/admin.css">
+        <link rel="stylesheet" href="style/app.css">
+        <link rel="stylesheet" href="style/bootstrap-tagsinput.css">
+        <link rel="stylesheet" href="style/menu.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="canonical" href="https://nekshor.fr/">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" media="screen" defer >
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous" async></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" media="screen" defer>
+
+
+        <link rel="preload" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />    
+        <!-- Primary Meta Tags -->
+        <title>NekShor - Antoine Bigot. Portfolio développement freelance</title>
+        <meta name="title" content="Portfolio Antoine Bigot">
+        <meta name="description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://nekshor.fr/">
+        <meta property="og:title" content="Portfolio">
+        <meta property="og:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+        <meta property="og:image" content="">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="https://nekshor.fr/">
+        <meta property="twitter:title" content="Portfolio">
+        <meta property="twitter:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
+        <meta property="twitter:image" content="">
+        <meta name="google-site-verification" content="Y23QN_6NDC6LWrpV-DKURUVYKd4OB4g4IxvTelqmoFY" />
+        <meta name="robots" content="index, follow">
+    </head>
+    <body translate="no">
+        <div class="menu">
+            
+            <a href="/" title="Home NekShor" class="menu-logo">
+                <img src="img/logo-white.svg" alt="Logo NekShor" title="Logo NekShor">
+            </a>
+            <button onclick="openMenu()" class="menu-button">
+                <i class="material-icons" style="color: white;">menu</i>
+            </button>
+            <menu>
+                <li><a title="Home" href="/fr/"><i class="material-icons" style="font-size:35px;color: white;">home</i></a></li>
+                
+                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/fr/curriculum#curriculum">Curriculum</a></li>
+                    
+                <li><a title="Projets" href="/fr/#projets">Projets</a></li>
+                <li><a title="Compétences" href="/fr/#competences">Compétences</a></li>
+                
+                <li style="display: none;"><a title="parcours proffessionnel" href="/fr/curriculum#pro">Parcours</a></li>
+                <li><a title="Formulaire de contact" href="/fr/#contacts">Contact</a></li>
+            </menu>
+        </div>
+        <div class="content">
+            <div class="page">
+                <div class="images">
+                </div>
+                <div class="text">
+                    <div class="fix">
+                        <div class="head">
+                            <h1></h1>
+                            <a id="link" title="Lien du projet" href="{{ projet.lien }}"><h3>Voir le projet</h3></a>
+                        </div>
+                        <p class="description">{{ projet.text | raw  }} </p>
+                        <div class="technosProjet">
+                            {% for techno in technos %}
+                            <div class="technoProjet">
+                                <img alt="Technologie utilisées" title="Technologie utilisées" src="{{ techno.infos.img }}" alt="{{ techno.infos.img|split('/')|last|split('-')|last|split('.')|first|replace({'_': ' '}) }}">
+                            </div>           
+                            {% endfor %}
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="datas/projects.js"></script>
+        <script src="datas/technos.js"></script>
+
+        <script src="js/curriculum.js"></script>
+        <script src="js/menu.js"></script>
+        <script src="js/display_infos_projets.js"></script>
+
+
+        <script defer src="https://www.googletagmanager.com/gtag/js?id=G-GXZ5X12191"></script>
+        <script async>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            });
+        });
+
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-GXZ5X12191');
+
+            function error(){
+                if(document.querySelector('.content').innerHTML === ""){
+                    document.querySelector('.errordiv').style.display = "flex";
+                    // no follow
+                    document.querySelector('meta[name="robots"]').content = "noindex, nofollow";
+                }
+            }
+
+            window.addEventListener('load', function(){
+                error()
+            })
+        </script>
+    </body>
+</html>

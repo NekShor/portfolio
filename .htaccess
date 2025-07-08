@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Redirige tout ce qui commence par /projet vers projet.html
+RewriteRule ^projet(/.*)?$ /projet.html [L]
+
+# Ignore les fichiers/dossiers existants
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Sinon, tout le reste vers index.html
+RewriteRule ^ index.html [L]
