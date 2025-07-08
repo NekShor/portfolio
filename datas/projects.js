@@ -11,7 +11,10 @@ var projects = [
             'unity',
             'csharp'
         ],
-        description : 'CoronaRun est un projet fait au Cesi qui consiste en un jeu vidéo ou le professeur Didier Raoult se bat contre le covid.',
+        description : {
+            fr: 'CoronaRun est un projet fait au Cesi qui consiste en un jeu vidéo ou le professeur Didier Raoult se bat contre le covid.',
+            en: 'CoronaRun is a project made at Cesi which consists of a video game where professor Didier Raoult fights against covid.'
+        },
         visible : true,
         order: 7
     },
@@ -32,7 +35,10 @@ var projects = [
             'SQL',
             'apache'
         ],
-        description : 'Expandable était le site du BDE du Cesi de Rouen. Il permettait aux étudiants de consulter les événements à venir, de s\'inscrire et de payer en ligne. Le site a été réalisé en HTML, CSS, JavaScript, PHP avec le framework Symfony et une base de données SQL.',
+        description : {
+            fr: 'Expandable était le site du BDE du Cesi de Rouen. Il permettait aux étudiants de consulter les événements à venir, de s\'inscrire et de payer en ligne. Le site a été réalisé en HTML, CSS, JavaScript, PHP avec le framework Symfony et une base de données SQL.',
+            en: 'Expandable was the BDE website of Cesi Rouen. It allowed students to view upcoming events, register and pay online. The site was built with HTML, CSS, JavaScript, PHP with the Symfony framework and a SQL database.'
+        },
         visible : false,
         order: 5
     },
@@ -48,7 +54,10 @@ var projects = [
             'css',
             'js'
         ],
-        description : 'Le jeu de la vie de Conway est un automate cellulaire inventé par John Horton Conway en 1970. Il s\'agit d\'un modèle mathématique qui simule l\'évolution d\'une population de cellules sur une grille en fonction de règles simples. Je l\'ai réalisé en HTML, CSS et JavaScript pour démontrer son fonctionnement.',
+        description : {
+            fr: 'Le jeu de la vie de Conway est un automate cellulaire inventé par John Horton Conway en 1970. Il s\'agit d\'un modèle mathématique qui simule l\'évolution d\'une population de cellules sur une grille en fonction de règles simples. Je l\'ai réalisé en HTML, CSS et JavaScript pour démontrer son fonctionnement.',
+            en: 'Conway\'s Game of Life is a cellular automaton invented by John Horton Conway in 1970. It is a mathematical model that simulates the evolution of a population of cells on a grid according to simple rules. I made it in HTML, CSS and JavaScript to demonstrate its operation.'
+        },
         visible : true,
         order: 2
     },
@@ -67,7 +76,10 @@ var projects = [
             'css',
             'js',
         ],
-        description : 'Mon ancien portfolio, réalisé en HTML, CSS et JavaScript. Il présente mes compétences, mes projets et mes expériences professionnelles. Bien que ce ne soit pas le plus récent, il reste un témoignage de mon parcours et de mon évolution en tant que développeur web.',
+        description : {
+            fr: 'Mon ancien portfolio, réalisé en HTML, CSS et JavaScript. Il présente mes compétences, mes projets et mes expériences professionnelles. Bien que ce ne soit pas le plus récent, il reste un témoignage de mon parcours et de mon évolution en tant que développeur web.',
+            en: 'My old portfolio, made in HTML, CSS and JavaScript. It presents my skills, my projects and my professional experiences. Although it is not the most recent, it remains a testimony of my journey and my evolution as a web developer.'
+        },
         visible : true,
         order: 8
     },
@@ -86,7 +98,10 @@ var projects = [
             'SQL',
             'docker'
         ],
-        description : 'Valgo étant une entreprise de 600 employés, cet entreprise a eu le besoin d\'un portail pour les employés. Le portail permet aux employés de se connecter, de consulter leurs informations personnelles et de consulter les actualités de l\'entreprise.',
+        description : {
+            fr: 'Valgo étant une entreprise de 600 employés, cet entreprise a eu le besoin d\'un portail pour les employés. Le portail permet aux employés de se connecter, de consulter leurs informations personnelles et de consulter les actualités de l\'entreprise.',
+            en: 'Valgo being a company of 600 employees, this company needed a portal for employees. The portal allows employees to connect, view their personal information and view company news.'
+        },
         visible : true,
         order: 4
     },
@@ -106,7 +121,10 @@ var projects = [
             'codeigniter'
         ],
         visible : true,
-        description : 'EcoQuiz est un jeu éducatif en ligne visant à sensibiliser les utilisateurs aux enjeux environnementaux. Il propose des quiz interactifs sur divers sujets écologiques, permettant aux joueurs de tester et d\'améliorer leurs connaissances tout en s\'amusant.',
+        description : {
+            fr: 'EcoQuiz est un jeu éducatif en ligne visant à sensibiliser les utilisateurs aux enjeux environnementaux. Il propose des quiz interactifs sur divers sujets écologiques, permettant aux joueurs de tester et d\'améliorer leurs connaissances tout en s\'amusant.',
+            en: 'EcoQuiz is an online educational game aimed at raising awareness about environmental issues. It offers interactive quizzes on various ecological topics, allowing players to test and improve their knowledge while having fun.'
+        },
         order: 6
     },
     {
@@ -125,7 +143,10 @@ var projects = [
             'js',
             'php',
         ],
-        description : 'Aubox du florival une entreprise qui fait de la location de box et d\'éspace de co-working. Le site permet de présenter les différents espaces disponibles, de consulter les tarifs et de réserver en ligne et de prendre contact avec l\'entreprise.',
+        description : {
+            fr: 'Aubox du florival une entreprise qui fait de la location de box et d\'éspace de co-working. Le site permet de présenter les différents espaces disponibles, de consulter les tarifs et de réserver en ligne et de prendre contact avec l\'entreprise.',
+            en: 'Aubox du florival is a company that rents boxes and co-working spaces. The site allows to present the different spaces available, to consult the rates and to book online and to contact the company.'
+        },
         visible : true,
         order: 1
     },
@@ -141,7 +162,10 @@ var projects = [
             'next',
             'strapi'
         ],
-        description : 'Le site du BDE Cesi Caen est un site de présentation du bureau des élèves du Cesi de Caen. Il permet de présenter les membres du BDE, les événements à venir et de contacter le BDE.',
+        description : {
+            fr: 'Le site du BDE Cesi Caen est un site de présentation du bureau des élèves du Cesi de Caen. Il permet de présenter les membres du BDE, les événements à venir et de contacter le BDE.',
+            en: 'The BDE Cesi Caen website is a presentation site for the student office of Cesi Caen. It allows to present the BDE members, upcoming events and to contact the BDE.'
+        },
         visible : true,
         order: 3
     }

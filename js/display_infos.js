@@ -3,7 +3,7 @@ function display_projects() {
     projects_first.forEach((project, index) => {
         var project_div = document.createElement('div');
         project_div.className = 'proj-g proj';
-        project_div.style.backgroundImage = `url('public/projets/${project.images[0]}')`;
+        project_div.style.backgroundImage = `url('/public/projets/${project.images[0]}')`;
         var nom = (project.nom.substr(0, 1).toUpperCase() + project.nom.substr(1).toLowerCase()) || '';
         project_div.innerHTML = `<a title="Projet ${nom}" href="/projet/${project.nom.replaceAll(' ', '-')}"><div><h3>${nom}</h3></div></a>`;
         projects_first_div.appendChild(project_div);
@@ -14,7 +14,7 @@ function display_projects() {
         if (!project.visible) return; 
         var project_div = document.createElement('div');
         project_div.className = 'proj-p proj';
-        project_div.style.backgroundImage = `url('public/projets/${project.images[0]}')`;
+        project_div.style.backgroundImage = `url('/public/projets/${project.images[0]}')`;
         var nom = (project.nom.substr(0, 1).toUpperCase() + project.nom.substr(1).toLowerCase()) || '';
         project_div.innerHTML = `<a title="Projet ${nom}" href="/projet/${project.nom.replaceAll(' ', '-')}"><div><h3>${nom}</h3></div></a>`;
         projects_div.appendChild(project_div);
@@ -28,7 +28,7 @@ function display_technos() {
         techno_div.className = 'tech';
         techno_div.innerHTML = `
             <div class="img">
-                <img src="public/technos/${techno.img}" title="logo de la technologie ${techno.nom}" alt="logo de la technologie ${techno.nom}">
+                <img src="/public/technos/${techno.img}" title="logo de la technologie ${techno.nom}" alt="logo de la technologie ${techno.nom}">
             </div>
             <p>${techno.nom}</p>
             <div class="stars">

@@ -28,20 +28,20 @@
 
         <link rel="preload" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />    
         <!-- Primary Meta Tags -->
-        <title>NekShor - Antoine Bigot. Portfolio développement freelance</title>
+        <title data-lang="title">NekShor - Antoine Bigot. Portfolio développement freelance</title>
         <meta name="title" content="Portfolio Antoine Bigot">
         <meta name="description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://nekshor.">
+        <meta property="og:url" content="https://nekshor.fr">
         <meta property="og:title" content="Portfolio">
         <meta property="og:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
         <meta property="og:image" content="">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="https://nekshor.">
+        <meta property="twitter:url" content="https://nekshor.fr">
         <meta property="twitter:title" content="Portfolio">
         <meta property="twitter:description" content="Découvrez le portfolio d'Antoine Bigot (NekShor), développeur fullstack passionné, et explorez ses réalisations exceptionnelles.">
         <meta property="twitter:image" content="">
@@ -58,11 +58,11 @@
             </button>
             <menu>
                 <li><a title="Home" href="/"><i class="material-icons" style="font-size:35px;color: white;">home</i></a></li>
-                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/curriculum#curriculum">Curriculum</a></li>
-                <li><a title="Projets" href="/#projets">Projets</a></li>
-                <li><a title="Compétences" href="/#competences">Compétences</a></li>
-                <li style="display: none;"><a title="parcours proffessionnel" href="/curriculum#pro">Parcours</a></li>
-                <li><a title="Formulaire de contact" href="/#contacts">Contact</a></li>
+                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/curriculum#curriculum" data-lang="menu_home">Curriculum</a></li>
+                <li><a title="Projets" href="/#projets" data-lang="menu_projets">Projets</a></li>
+                <li><a title="Compétences" href="/#competences" data-lang="menu_competence">Compétences</a></li>
+                <li style="display: none;"><a title="parcours proffessionnel" href="/curriculum#pro" data-lang="menu_parcour">Parcours</a></li>
+                <li><a title="Formulaire de contact" href="/#contacts" data-lang="menu_contact">Contact</a></li>
             </menu>
         </div>
         <div class="content">
@@ -79,10 +79,10 @@
             <div class="header">
                 <div class="text part">
                     <h1 class="url"><a title="Site NekShor" href="/">nekshor.fr</a></h1>
-                    <h2 class="titre1">Hey,</h2>
-                    <h3 class="titre2">Je suis <span>Antoine Bigot</span></h3>
-                    <h4 class="titre3">Développeur Fullstack</h4>
-                    <p class="titre4">
+                    <h2 class="titre1" data-lang="title_1">Hey,</h2>
+                    <h3 class="titre2" data-lang="title_2">Je suis <span>Antoine Bigot</span></h3>
+                    <h4 class="titre3" data-lang="title_3">Développeur Fullstack</h4>
+                    <p class="titre4" data-lang="title_4">
                         Bienvenue sur mon portfolio !
                         Je suis ouvert à toutes propositions liées au 
                         développement 
@@ -121,13 +121,13 @@
                             src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFDwDBsYdw&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
                         </iframe>
                         </div>
-                        <button id="downloadCv" class="btn btn-primary" onclick="download()">Télécharger</button>
+                        <button id="downloadCv" class="btn btn-primary" onclick="download()"  data-lang="download">Télécharger</button>
                     </div>
                 </div>
             </div>
             <div class="projets">
-                <h2 class="h1">Mes projets</h2>
-                <p class="texteDescriptif">
+                <h2 class="h1" data-lang="title_projet">Mes projets</h2>
+                <p class="texteDescriptif"  data-lang="text_projet">
                     Explorez ci-dessous une sélection de mes projets passionnants, où chaque image vous ouvre les portes vers une expérience unique.
                 </p>
                 <div class="projets-g projets-f">
@@ -143,8 +143,8 @@
                     </svg>
                 </div>
                 <div id="competences" class="background">
-                    <h2 >Ayez une idée de mes compétences</h2>
-                    <p class="texteDescriptif">
+                    <h2  data-lang="title_competence">Ayez une idée de mes compétences</h2>
+                    <p class="texteDescriptif" data-lang="text_competence">
                         Découvrez un aperçu de mes compétences et expertises dans le domaine de la technologie grâce à la sélection ci-dessous. (les étoiles ne servent que d'indication pour comparer mon niveau d'une technologie à l'autre)
                     </p>
                     <div class="liste">
@@ -230,8 +230,8 @@
             {{ form_end(form) }}</div>-->
             <!-- Contactez moi par mail ou sur linkedin -->
             <div class="contact">
-                <h2 class="h1">Contactez-moi</h2>
-                <p class="texteDescriptif">
+                <h2 class="h1"  data-lang="title_contact">Contactez-moi</h2>
+                <p class="texteDescriptif" data-lang="text_contact">
                     Vous pouvez me contacter par mail ou sur LinkedIn pour toute question ou proposition de collaboration.
                 </p>
                 <div class="contact-links">
@@ -280,7 +280,7 @@
                 </div>
                 <div class="copyright">
                     NekShor © 2022 - <span class="date"></span>
-                    <p class="partenaires">
+                    <p class="partenaires"  data-lang="voir_aussi">
                         Voir aussi : 
                     </p>
                     <div class="partenaireListe">
@@ -359,10 +359,12 @@
 
         <script src="/datas/projects.js"></script>
         <script src="/datas/technos.js"></script>
+        <script src="/datas/lang.js"></script>
 
         <script src="/js/curriculum.js"></script>
         <script src="/js/menu.js"></script>
         <script src="/js/display_infos.js"></script>
+        <script src="/js/translate.js"></script>
 
         <script defer src="https://www.googletagmanager.com/gtag/js?id=G-GXZ5X12191"></script>
         <script async>

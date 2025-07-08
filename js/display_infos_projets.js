@@ -56,7 +56,8 @@ function display_description() {
     var projet = getProjet();
     var descriptionElement = document.querySelector('.description');
     if (descriptionElement) {
-        descriptionElement.textContent = projet.description || 'Aucune description disponible pour ce projet.';
+        var lang = localStorage.getItem('lang') || 'fr';
+        descriptionElement.textContent = projet.description[lang];
     }
 }
 

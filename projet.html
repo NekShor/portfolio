@@ -59,14 +59,11 @@
             </button>
             <menu>
                 <li><a title="Home" href="/"><i class="material-icons" style="font-size:35px;color: white;">home</i></a></li>
-                
-                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/curriculum#curriculum">Curriculum</a></li>
-                    
-                <li><a title="Projets" href="/#projets">Projets</a></li>
-                <li><a title="Compétences" href="/#competences">Compétences</a></li>
-                
-                <li style="display: none;"><a title="parcours proffessionnel" href="/curriculum#pro">Parcours</a></li>
-                <li><a title="Formulaire de contact" href="/#contacts">Contact</a></li>
+                <li style="display: none;" class="curriculumDiv"><a title="Cv Antoine Bigot" href="/curriculum#curriculum" data-lang="menu_home">Curriculum</a></li>
+                <li><a title="Projets" href="/#projets" data-lang="menu_projets">Projets</a></li>
+                <li><a title="Compétences" href="/#competences" data-lang="menu_competence">Compétences</a></li>
+                <li style="display: none;"><a title="parcours proffessionnel" href="/curriculum#pro" data-lang="menu_parcour">Parcours</a></li>
+                <li><a title="Formulaire de contact" href="/#contacts" data-lang="menu_contact">Contact</a></li>
             </menu>
         </div>
         <div class="content">
@@ -88,11 +85,12 @@
 
         <script src="/datas/projects.js"></script>
         <script src="/datas/technos.js"></script>
+        <script src="/datas/lang.js"></script>
 
+        <script src="/js/translate.js"></script>
         <script src="/js/curriculum.js"></script>
         <script src="/js/menu.js"></script>
         <script src="/js/display_infos_projets.js"></script>
-
 
         <script defer src="https://www.googletagmanager.com/gtag/js?id=G-GXZ5X12191"></script>
         <script async>
