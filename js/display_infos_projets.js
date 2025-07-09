@@ -62,8 +62,8 @@ function display_description() {
 }
 
 function getProjet() {
-    var urlname = window.location.pathname.split('/')[window.location.pathname.split('/').length - 1];
-    var projet = projects.find(project => project.nom.replaceAll(' ', '-') === urlname.replaceAll(' ', '-'));
+    var projetName = new URLSearchParams(window.location.search).get('projet');
+    var projet = projects.find(project => project.nom.replaceAll(' ', '-') === projetName.replaceAll(' ', '-'));
     console.log(projet);
     if (!projet) {
         window.location.href = '/';
