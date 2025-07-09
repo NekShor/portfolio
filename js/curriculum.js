@@ -1,8 +1,8 @@
 window.addEventListener('load', () => {
     var curriculumDiv = document.querySelectorAll('.curriculumDiv');
-    var urlParams = window.location.href.split('/')[window.location.href.split('/').length - 1];
+    var urlParams = new URLSearchParams(window.location.search).get('cv');
 
-    if (urlParams === 'cv') {
+    if (urlParams === 'true') {
         curriculumDiv.forEach((element) => {
             element.style.display = 'block';
         });
