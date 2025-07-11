@@ -47,7 +47,7 @@ var projects = [
         images : [
             'game-of-life/game-of-life-1.png',
             'game-of-life/game-of-life-2.png',
-            'game-of-life/game-of-life-3.png'
+            'game-of-life/game-of-life-3.webp'
         ],
         technos: [
             'html',
@@ -59,7 +59,8 @@ var projects = [
             en: 'Conway\'s Game of Life is a cellular automaton invented by John Horton Conway in 1970. It is a mathematical model that simulates the evolution of a population of cells on a grid according to simple rules. I made it in HTML, CSS and JavaScript to demonstrate its operation.'
         },
         visible : true,
-        order: 2
+        order: 2,
+        link: "https://nekshor.github.io/jeudelavie/"
     },
     {
         nom : 'Ancien Portfolio',
@@ -148,7 +149,8 @@ var projects = [
             en: 'Aubox du florival is a company that rents boxes and co-working spaces. The site allows to present the different spaces available, to consult the rates and to book online and to contact the company.'
         },
         visible : true,
-        order: 1
+        order: 1,
+        link: "https://www.auboxduflorival.fr/"
     },
     {
         nom : 'Bde Cesi Caen',

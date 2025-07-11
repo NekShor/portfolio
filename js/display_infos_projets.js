@@ -23,8 +23,8 @@ function display_link() {
     var projet = getProjet();
     var linkElement = document.querySelector('#link');
     if (linkElement) {
-        if (projet.lien !== undefined && projet.lien !== '-' && projet.lien !== '') {
-            linkElement.href = projet.lien;
+        if (projet.link !== undefined && projet.link !== '-' && projet.link !== '') {
+            linkElement.href = projet.link;
             linkElement.style.display = 'block';
         } else {
             linkElement.style.display = 'none';
