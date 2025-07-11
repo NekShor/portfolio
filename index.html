@@ -334,7 +334,13 @@
                 }
 
                 function download(){
-                    var pdf = 'https://nekshor.fr/public/pdf/CV_Antoine_Bigot.pdf';
+                    var lang = localStorage.getItem('lang') || 'fr';
+                    var pdf = '';
+                    if(lang === 'en'){
+                        pdf = 'https://nekshor.fr/public/pdf/CV_Antoine_Bigot_EN.pdf';
+                    }else if(lang === 'fr'){
+                        pdf = 'https://nekshor.fr/public/pdf/CV_Antoine_Bigot.pdf';
+                    }
                     var a = document.createElement('a');
                     a.href = pdf;
                     a.download = 'CV_Antoine_Bigot.pdf';
