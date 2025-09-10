@@ -59,7 +59,7 @@ var projects = [
             en: 'Conway\'s Game of Life is a cellular automaton invented by John Horton Conway in 1970. It is a mathematical model that simulates the evolution of a population of cells on a grid according to simple rules. I made it in HTML, CSS and JavaScript to demonstrate its operation.'
         },
         visible : true,
-        order: 2,
+        order: 3,
         link: "https://nekshor.github.io/jeudelavie/"
     },
     {
@@ -169,11 +169,11 @@ var projects = [
             en: 'The BDE Cesi Caen website is a presentation site for the student office of Cesi Caen. It allows to present the BDE members, upcoming events and to contact the BDE.'
         },
         visible : true,
-        order: 3
+        order: 2
     }
 ];
 
-var number_first = [0, 2]
+var number_first = [0, 1]
 var projects_first = [];
 var project_use = projects.slice(0);
 number_first.forEach((number, index) => {
