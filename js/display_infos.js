@@ -48,4 +48,4 @@ function display_date(){
 
 display_date();
 display_technos();
-display_projects();
+// display_projects();

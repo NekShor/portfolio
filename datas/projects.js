@@ -180,3 +180,5 @@ number_first.forEach((number, index) => {
     projects_first.push(project_use[number]);
     project_use[number].visible = false;
 })
+
+display_projects();
