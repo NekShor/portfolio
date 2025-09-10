@@ -175,7 +175,7 @@ var projects = [
 
 var number_first = [0, 1]
 var projects_first = [];
-var project_use = projects.slice(0);
+var project_use = projects.slice(0).sort((a, b) => a.order - b.order);
 number_first.forEach((number, index) => {
     projects_first.push(project_use[number]);
     project_use[number].visible = false;
