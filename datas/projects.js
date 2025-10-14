@@ -176,7 +176,9 @@ var projects = [
         images : [
             'editis/editis-1.png',
             'editis/editis-2.png',
-            'editis/editis-3.png'
+            'editis/editis-3.png',
+            'editis/editis-4.png',
+            'editis/editis-5.png'
         ],
         technos: [
             'Node.js',
