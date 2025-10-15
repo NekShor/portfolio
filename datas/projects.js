@@ -131,6 +131,7 @@ var projects = [
     {
         nom : 'Aubox du Florival',
         images : [
+            'aubox/aubox-video-1.mp4',
             'aubox/aubox-1.png',
             'aubox/aubox-2.png',
             'aubox/aubox-3.png',
