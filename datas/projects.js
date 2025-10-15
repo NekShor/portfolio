@@ -175,6 +175,7 @@ var projects = [
     {
         nom : 'Editis énergie',
         images : [
+            'editis/editis-video-1.mp4',
             'editis/editis-1.png',
             'editis/editis-2.png',
             'editis/editis-3.png',
