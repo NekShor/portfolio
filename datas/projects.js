@@ -16,7 +16,7 @@ var projects = [
             en: 'CoronaRun is a project made at Cesi which consists of a video game where professor Didier Raoult fights against covid.'
         },
         visible : true,
-        order: 7
+        order: 8
     },
     {
         nom : 'Expandable',
@@ -40,7 +40,7 @@ var projects = [
             en: 'Expandable was the BDE website of Cesi Rouen. It allowed students to view upcoming events, register and pay online. The site was built with HTML, CSS, JavaScript, PHP with the Symfony framework and a SQL database.'
         },
         visible : false,
-        order: 5
+        order: 6
     },
     {
         nom : 'Game of Life by Conway',
@@ -59,7 +59,7 @@ var projects = [
             en: 'Conway\'s Game of Life is a cellular automaton invented by John Horton Conway in 1970. It is a mathematical model that simulates the evolution of a population of cells on a grid according to simple rules. I made it in HTML, CSS and JavaScript to demonstrate its operation.'
         },
         visible : true,
-        order: 3,
+        order: 4,
         link: "https://nekshor.github.io/jeudelavie/"
     },
     {
@@ -82,7 +82,7 @@ var projects = [
             en: 'My old portfolio, made in HTML, CSS and JavaScript. It presents my skills, my projects and my professional experiences. Although it is not the most recent, it remains a testimony of my journey and my evolution as a web developer.'
         },
         visible : true,
-        order: 8
+        order: 9
     },
     {
         nom : 'Portail Valgo',
@@ -104,7 +104,7 @@ var projects = [
             en: 'Valgo being a company of 600 employees, this company needed a portal for employees. The portal allows employees to connect, view their personal information and view company news.'
         },
         visible : true,
-        order: 4
+        order: 5
     },
     {
         nom : 'ecoquiz',
@@ -126,7 +126,7 @@ var projects = [
             fr: 'EcoQuiz est un jeu éducatif en ligne visant à sensibiliser les utilisateurs aux enjeux environnementaux. Il propose des quiz interactifs sur divers sujets écologiques, permettant aux joueurs de tester et d\'améliorer leurs connaissances tout en s\'amusant.',
             en: 'EcoQuiz is an online educational game aimed at raising awareness about environmental issues. It offers interactive quizzes on various ecological topics, allowing players to test and improve their knowledge while having fun.'
         },
-        order: 6
+        order: 7
     },
     {
         nom : 'Aubox du Florival',
@@ -169,7 +169,29 @@ var projects = [
             en: 'The BDE Cesi Caen website is a presentation site for the student office of Cesi Caen. It allows to present the BDE members, upcoming events and to contact the BDE.'
         },
         visible : true,
-        order: 2
+        order: 3
+    },
+    {
+        nom : 'Editis énergie',
+        images : [
+            'editis/editis-1.png',
+            'editis/editis-2.png',
+            'editis/editis-3.png',
+            'editis/editis-4.png',
+            'editis/editis-5.png'
+        ],
+        technos: [
+            'Node.js',
+            'Nginx',
+            'HTML',
+            'CSS'
+        ],
+        description : {
+            fr: 'Le site web d’Editis Énergies a été conçu pour présenter les services et l’expertise de l’entreprise dans le domaine de la performance énergétique. Il offre une vitrine claire et moderne mettant en avant les solutions proposées, les réalisations et la démarche environnementale d’Editis Énergies. L’objectif du projet était de créer une plateforme à la fois esthétique, rapide et intuitive, permettant aux visiteurs de découvrir les activités de l’entreprise, d’obtenir des informations sur les prestations et de contacter facilement l’équipe pour des demandes de devis ou de partenariat. Le site intègre également un espace dédié aux clients, leur donnant la possibilité de suivre leurs données énergétiques et leurs rapports de performance.'
+        },
+        visible : true,
+        order: 2,
+        link: "https://www.editis-energies.fr/"
     }
 ];
 
