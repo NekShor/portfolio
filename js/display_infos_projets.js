@@ -3,11 +3,21 @@ function display_images() {
     var project = getProjet();
 
     project.images.forEach((img, imgIndex) => {
-        var imgElement = document.createElement('img');
-        imgElement.src = '/public/projets/' + img;
-        imgElement.alt = 'Visuel et ' + project.name;
-        imgElement.title = 'Visuel et ' + project.name;
-        projects_first_div.appendChild(imgElement);
+        var extension = img.split('.').pop().toLowerCase();
+        if (extension === 'mp4' || extension === 'webm' || extension === 'ogg') {
+            var videoElement = document.createElement('video');
+            videoElement.src = '/public/projets/' + img;
+            videoElement.controls = true;
+            videoElement.alt = 'Visuel et ' + project.name;
+            videoElement.title = 'Visuel et ' + project.name;
+            projects_first_div.appendChild(videoElement);
+        } else {
+            var imgElement = document.createElement('img');
+            imgElement.src = '/public/projets/' + img;
+            imgElement.alt = 'Visuel et ' + project.name;
+            imgElement.title = 'Visuel et ' + project.name;
+            projects_first_div.appendChild(imgElement);
+        }
     });
 }
 
