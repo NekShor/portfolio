@@ -21,7 +21,7 @@ body{
 }
 
 
-.page .images img{
+.page .images img, .page .images video{
     width: 100%;
     height: auto;
     margin: 10px 0px;
@@ -102,7 +102,7 @@ body{
 
     }
 
-    .page .images img{
+    .page .images img, .page .images video{
         width: 80%;
         height: auto;
         margin: 10px 0px;
