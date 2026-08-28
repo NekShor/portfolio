@@ -18,6 +18,8 @@ var lang = {
         text_competence: 'Discover an overview of my skills and expertise in the field of technology through the selection below. (the stars are only an indication to compare my level from one technology to another)',
         title_contact: 'Contact me',
         text_contact: 'You can contact me by email or on LinkedIn for any questions or collaboration proposals.',
+        phone: '+353 85 147 0957',
+        phone_href: 'tel:+353851470957',
         voir_aussi: 'See also:',
     }
 }
