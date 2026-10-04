@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratège d'Équipage - Multi-Jeux</title>
+    <style>
+        :root {
+            --gold: #ffcc00;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #00d4ff;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border: 1px solid #333;
+        }
+        h1 { color: var(--gold); margin-top: 0; text-align: center; }
+        
+        /* Configuration du jeu */
+        .config-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--accent); }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Ajout d'amis */
+        .add-friend-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+        .slider-container { flex: 1; min-width: 200px; }
+        input[type="range"] { width: 100%; accent-color: var(--gold); }
+
+        /* Liste et Résultats */
+        .main-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
+        .friend-list { max-height: 300px; overflow-y: auto; }
+        .friend-card {
+            background: #2a2a2a;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-add { background: var(--gold); color: black; border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .btn-del { background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .btn-add-rule { background: var(--accent); color: #00131a; border: none; padding: 10px 16px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+
+        .rules-panel {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .rules-controls {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+        .rules-controls select {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .rules-list {
+            margin-top: 12px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .rule-card {
+            background: #2a2a2a;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Jauges */
+        .gauge-container { margin-bottom: 15px; }
+        .gauge-label { display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 4px; }
+        .bar-bg { background: #333; height: 12px; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.4s ease; }
+        .hidden { display: none; }
+        
+        .advice-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px dashed var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>🎮 Optimisateur d'Équipage</h1>
+
+    <div class="config-section">
+        <div>
+            <label>Joueurs Minimum (Cible)</label>
+            <input type="number" id="minPlayers" value="3" onchange="calculate()">
+        </div>
+        <div>
+            <label>Joueurs Maximum (Capacité)</label>
+            <input type="number" id="maxPlayers" value="4" onchange="calculate()">
+        </div>
+        <div style="grid-column: 1 / -1;">
+            <label style="display:flex; gap:8px; align-items:center; color:#e0e0e0; margin:0;">
+                <input type="checkbox" id="multiCrewMode" onchange="toggleCrewModeUI(); calculate();">
+                Activer le mode 2 équipages
+            </label>
+        </div>
+    </div>
+
+    <div class="add-friend-box">
+        <div style="flex: 1;">
+            <label>Nom du pote</label>
+            <input type="text" id="friendName" placeholder="Ex: Jean-Sébastien">
+        </div>
+        <div class="slider-container">
+            <label>Probabilité de présence : <span id="probVal">70</span>%</label>
+            <input type="range" id="friendProb" min="0" max="100" value="70" oninput="document.getElementById('probVal').innerText = this.value">
+        </div>
+        <button class="btn-add" onclick="addFriend()">INVITER</button>
+    </div>
+
+    <div class="rules-panel">
+        <h3 style="color:var(--accent); margin-top:0;">Règles Relationnelles</h3>
+        <div class="rules-controls">
+            <div>
+                <label>Personne A (source)</label>
+                <select id="ruleSource"></select>
+            </div>
+            <div>
+                <label>Type de règle</label>
+                <select id="ruleType">
+                    <option value="requires">B ne peut venir QUE si A est là</option>
+                    <option value="blocks">Si A vient, B ne vient PAS</option>
+                </select>
+            </div>
+            <div>
+                <label>Personne B (cible)</label>
+                <select id="ruleTarget"></select>
+            </div>
+            <button class="btn-add-rule" onclick="addRule()">Ajouter</button>
+        </div>
+        <div id="rulesList" class="rules-list"></div>
+    </div>
+
+    <div class="main-grid">
+        <div>
+            <h3 style="color:var(--accent)">Invités</h3>
+            <div id="listDisplay" class="friend-list"></div>
+        </div>
+
+        <div>
+            <h3 style="color:var(--accent)">Analyse des Probabilités</h3>
+            <div id="statsBox">
+                <div class="gauge-container">
+                    <div class="gauge-label"><span>Pas assez (< Min)</span><span id="txtLow">0%</span></div>
+                    <div class="bar-bg"><div id="barLow" class="bar-fill" style="background: #ff4444;"></div></div>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-label"><span>Équipage Idéal (Min-Max)</span><span id="txtIdeal">0%</span></div>
+                    <div class="bar-bg"><div id="barIdeal" class="bar-fill" style="background: #00c851;"></div></div>
+                </div>
+                <div class="gauge-container" id="gapGauge">
+                    <div class="gauge-label"><span>Entre 1 et 2 équipages (Max+1 à 2*Min-1)</span><span id="txtGap">0%</span></div>
+                    <div class="bar-bg"><div id="barGap" class="bar-fill" style="background: #ff8800;"></div></div>
+                </div>
+                <div class="gauge-container" id="dualGauge">
+                    <div class="gauge-label"><span>2e équipage possible (2*Min à 2*Max)</span><span id="txtDual">0%</span></div>
+                    <div class="bar-bg"><div id="barDual" class="bar-fill" style="background: #33b5e5;"></div></div>
+                </div>
+                <div class="gauge-container">
+                    <div class="gauge-label"><span id="highLabel">Trop nombreux même pour 2 équipages (> 2*Max)</span><span id="txtHigh">0%</span></div>
+                    <div class="bar-bg"><div id="barHigh" class="bar-fill" style="background: #ffbb33;"></div></div>
+                </div>
+            </div>
+            <div id="advice" class="advice-box">Ajoutez des joueurs pour simuler...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let players = [];
+    let rules = [];
+
+    function addFriend() {
+        const name = document.getElementById('friendName').value || "Anonyme";
+        const prob = parseInt(document.getElementById('friendProb').value) / 100;
+        
+        players.push({ name, prob });
+        document.getElementById('friendName').value = "";
+        renderList();
+        renderRuleSelectors();
+        calculate();
+    }
+
+    function removeFriend(index) {
+        players.splice(index, 1);
+        rules = rules.filter(r => r.source !== index && r.target !== index)
+            .map(r => ({
+                ...r,
+                source: r.source > index ? r.source - 1 : r.source,
+                target: r.target > index ? r.target - 1 : r.target
+            }));
+        renderList();
+        renderRuleSelectors();
+        renderRules();
+        calculate();
+    }
+
+    function renderRuleSelectors() {
+        const sourceSel = document.getElementById('ruleSource');
+        const targetSel = document.getElementById('ruleTarget');
+
+        if (!sourceSel || !targetSel) return;
+
+        if (players.length < 2) {
+            sourceSel.innerHTML = '<option value="">Ajoute au moins 2 joueurs</option>';
+            targetSel.innerHTML = '<option value="">Ajoute au moins 2 joueurs</option>';
+            return;
+        }
+
+        const options = players.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+        sourceSel.innerHTML = options;
+        targetSel.innerHTML = options;
+        targetSel.selectedIndex = sourceSel.selectedIndex === 0 ? 1 : 0;
+    }
+
+    function renderRules() {
+        const container = document.getElementById('rulesList');
+        if (!container) return;
+
+        if (rules.length === 0) {
+            container.innerHTML = "<span style='color:#bdbdbd;'>Aucune règle active.</span>";
+            return;
+        }
+
+        container.innerHTML = rules.map((rule, i) => {
+            const sourceName = players[rule.source] ? players[rule.source].name : "?";
+            const targetName = players[rule.target] ? players[rule.target].name : "?";
+            const txt = rule.type === "requires"
+                ? `<strong>${targetName}</strong> vient seulement si <strong>${sourceName}</strong> est là`
+                : `si <strong>${sourceName}</strong> vient, alors <strong>${targetName}</strong> est absent`;
+
+            return `
+                <div class="rule-card">
+                    <span>${txt}</span>
+                    <button class="btn-del" onclick="removeRule(${i})">Retirer</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function hasCycle() {
+        const adjacency = new Map();
+        for (let i = 0; i < players.length; i++) adjacency.set(i, []);
+        for (const rule of rules) adjacency.get(rule.source).push(rule.target);
+
+        const visiting = new Set();
+        const visited = new Set();
+
+        function dfs(node) {
+            if (visiting.has(node)) return true;
+            if (visited.has(node)) return false;
+
+            visiting.add(node);
+            for (const nei of adjacency.get(node)) {
+                if (dfs(nei)) return true;
+            }
+            visiting.delete(node);
+            visited.add(node);
+            return false;
+        }
+
+        for (let i = 0; i < players.length; i++) {
+            if (dfs(i)) return true;
+        }
+        return false;
+    }
+
+    function addRule() {
+        if (players.length < 2) return;
+
+        const source = parseInt(document.getElementById('ruleSource').value, 10);
+        const target = parseInt(document.getElementById('ruleTarget').value, 10);
+        const type = document.getElementById('ruleType').value;
+
+        if (Number.isNaN(source) || Number.isNaN(target)) return;
+
+        if (source === target) {
+            alert("Une personne ne peut pas avoir une règle sur elle-même.");
+            return;
+        }
+
+        const exists = rules.some(r => r.source === source && r.target === target && r.type === type);
+        if (exists) {
+            alert("Cette règle existe déjà.");
+            return;
+        }
+
+        rules.push({ source, target, type });
+        if (hasCycle()) {
+            rules.pop();
+            alert("Règle refusée: cela crée une boucle de dépendances (A->B->...->A).");
+            return;
+        }
+
+        renderRules();
+        calculate();
+    }
+
+    function removeRule(index) {
+        rules.splice(index, 1);
+        renderRules();
+        calculate();
+    }
+
+    function getConditionalPresenceProb(playerIndex, state) {
+        let p = players[playerIndex].prob;
+
+        for (const rule of rules) {
+            if (rule.target !== playerIndex) continue;
+
+            const sourcePresent = state[rule.source];
+            if (rule.type === 'requires' && !sourcePresent) {
+                return 0;
+            }
+            if (rule.type === 'blocks' && sourcePresent) {
+                return 0;
+            }
+        }
+
+        return p;
+    }
+
+    function buildTopologicalOrder() {
+        const indegree = new Array(players.length).fill(0);
+        const adjacency = new Map();
+        for (let i = 0; i < players.length; i++) adjacency.set(i, []);
+
+        for (const rule of rules) {
+            adjacency.get(rule.source).push(rule.target);
+            indegree[rule.target] += 1;
+        }
+
+        const queue = [];
+        for (let i = 0; i < indegree.length; i++) {
+            if (indegree[i] === 0) queue.push(i);
+        }
+
+        const order = [];
+        while (queue.length > 0) {
+            const node = queue.shift();
+            order.push(node);
+            for (const nei of adjacency.get(node)) {
+                indegree[nei] -= 1;
+                if (indegree[nei] === 0) queue.push(nei);
+            }
+        }
+
+        return order;
+    }
+
+    function computeDistributionWithRules() {
+        const n = players.length;
+        const order = buildTopologicalOrder();
+
+        // Defensive fallback: si l'ordre topo est incomplet, on annule les règles.
+        if (order.length !== n) {
+            const dp = new Array(n + 1).fill(0);
+            dp[0] = 1;
+            for (const player of players) {
+                const next = new Array(n + 1).fill(0);
+                for (let i = 0; i <= n; i++) {
+                    if (dp[i] === 0) continue;
+                    if (i + 1 <= n) next[i + 1] += dp[i] * player.prob;
+                    next[i] += dp[i] * (1 - player.prob);
+                }
+                for (let i = 0; i <= n; i++) dp[i] = next[i];
+            }
+            return dp;
+        }
+
+        const state = new Array(n).fill(false);
+        const dp = new Array(n + 1).fill(0);
+
+        function backtrack(pos, probAcc, countPresent) {
+            if (pos === n) {
+                dp[countPresent] += probAcc;
+                return;
+            }
+
+            const playerIndex = order[pos];
+            const pPresent = getConditionalPresenceProb(playerIndex, state);
+
+            state[playerIndex] = true;
+            backtrack(pos + 1, probAcc * pPresent, countPresent + 1);
+
+            state[playerIndex] = false;
+            backtrack(pos + 1, probAcc * (1 - pPresent), countPresent);
+        }
+
+        backtrack(0, 1, 0);
+        return dp;
+    }
+
+    function isSingleCrewMode() {
+        return document.getElementById('multiCrewMode')?.checked !== true;
+    }
+
+    function toggleCrewModeUI() {
+        const single = isSingleCrewMode();
+        const gapGauge = document.getElementById('gapGauge');
+        const dualGauge = document.getElementById('dualGauge');
+        const highLabel = document.getElementById('highLabel');
+
+        if (gapGauge) gapGauge.classList.toggle('hidden', single);
+        if (dualGauge) dualGauge.classList.toggle('hidden', single);
+        if (highLabel) {
+            highLabel.innerText = single
+                ? 'Trop nombreux (> Max)'
+                : 'Trop nombreux même pour 2 équipages (> 2*Max)';
+        }
+    }
+
+    function renderList() {
+        const container = document.getElementById('listDisplay');
+        container.innerHTML = players.map((p, i) => `
+            <div class="friend-card">
+                <span><strong>${p.name}</strong> (${Math.round(p.prob*100)}%)</span>
+                <button class="btn-del" onclick="removeFriend(${i})">Retirer</button>
+            </div>
+        `).join('');
+    }
+
+    function calculate() {
+        const min = parseInt(document.getElementById('minPlayers').value);
+        const max = parseInt(document.getElementById('maxPlayers').value);
+        
+        if (players.length === 0) return;
+
+        const dp = computeDistributionWithRules();
+        const singleCrew = isSingleCrewMode();
+
+        const dualMin = min * 2;
+        const dualMax = max * 2;
+
+        // Agrégation des résultats
+        let pLow = 0, pIdeal = 0, pGap = 0, pDual = 0, pHigh = 0;
+        dp.forEach((prob, count) => {
+            if (count < min) pLow += prob;
+            else if (count >= min && count <= max) pIdeal += prob;
+            else if (singleCrew) pHigh += prob;
+            else if (count > max && count < dualMin) pGap += prob;
+            else if (count >= dualMin && count <= dualMax) pDual += prob;
+            else if (count > dualMax) pHigh += prob;
+        });
+
+        updateUI(pLow, pIdeal, pGap, pDual, pHigh, min, max);
+    }
+
+    function updateUI(low, ideal, gap, dual, high, min, max) {
+        const singleCrew = isSingleCrewMode();
+
+        // Update bars
+        document.getElementById('barLow').style.width = (low * 100) + "%";
+        document.getElementById('barIdeal').style.width = (ideal * 100) + "%";
+        document.getElementById('barGap').style.width = (gap * 100) + "%";
+        document.getElementById('barDual').style.width = (dual * 100) + "%";
+        document.getElementById('barHigh').style.width = (high * 100) + "%";
+        
+        // Update text
+        document.getElementById('txtLow').innerText = Math.round(low * 100) + "%";
+        document.getElementById('txtIdeal').innerText = Math.round(ideal * 100) + "%";
+        document.getElementById('txtGap').innerText = Math.round(gap * 100) + "%";
+        document.getElementById('txtDual').innerText = Math.round(dual * 100) + "%";
+        document.getElementById('txtHigh').innerText = Math.round(high * 100) + "%";
+
+        // Advice logic
+        const adv = document.getElementById('advice');
+        if (low > 0.35) {
+            adv.innerHTML = "📉 <span style='color:#ff4444'>ALERTE :</span> Trop de risques de ne pas être assez. <br>Relance quelqu'un d'autre.";
+        } else if (singleCrew && high > 0.25) {
+            adv.innerHTML = "⚠️ <span style='color:#ffbb33'>SURRÉSERVATION :</span> Tu risques de devoir virer quelqu'un. <br>Stop les invitations.";
+        } else if (gap > 0.2) {
+            adv.innerHTML = "🧩 <span style='color:#ff8800'>ZONE ENTRE-DEUX :</span> Vous dépassez souvent 1 équipage, sans atteindre 2 complets (ex: 5). <br>Invite 1-2 personnes de plus ou baisse la cible.";
+        } else if (dual >= 0.35) {
+            adv.innerHTML = "🛟 <span style='color:#33b5e5'>PLAN B SOLIDE :</span> Il y a de bonnes chances de pouvoir lancer 2 équipages en parallèle.";
+        } else if (high > 0.2) {
+            adv.innerHTML = "⚠️ <span style='color:#ffbb33'>SURCAPACITÉ :</span> Vous risquez d'être trop nombreux même pour 2 équipages. <br>Prévois une 3e table ou limite les invites.";
+        } else if (ideal >= 0.6) {
+            adv.innerHTML = "✅ <span style='color:#00c851'>SESSION VALIDÉE :</span> Statistiquement, vous serez entre " + min + " et " + max + ".";
+        } else {
+            adv.innerHTML = "⚖️ <span style='color:white'>INCERTITUDE :</span> Les probabilités sont dispersées. Demande des réponses fermes.";
+        }
+    }
+
+    renderRuleSelectors();
+    renderRules();
+    toggleCrewModeUI();
+</script>
+
+</body>
+</html>

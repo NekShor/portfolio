@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire Noesis</title>
+    <style>
+        :root {
+            --bg: #f4f5fa;
+            --surface: #ffffff;
+            --border: #e2e5ec;
+            --text: #1e2130;
+            --text-muted: #6b7280;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --danger: #dc2626;
+            --radius: 10px;
+            --shadow: 0 1px 3px rgba(15, 23, 42, .08), 0 1px 2px rgba(15, 23, 42, .06);
+        }
+        html[data-theme="dark"] {
+            --bg: #14151f;
+            --surface: #1e2030;
+            --border: #333549;
+            --text: #e6e7ef;
+            --text-muted: #9599ad;
+            --primary: #6366f1;
+            --primary-dark: #818cf8;
+            --danger: #f87171;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 1px 2px rgba(0, 0, 0, .3);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .theme-toggle {
+            position: fixed;
+            top: .75rem;
+            right: .75rem;
+            z-index: 100;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            padding: .9rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .app-header h1 { font-size: 1.15rem; margin: 0; white-space: nowrap; }
+        .tabs { display: flex; gap: .4rem; flex: 1; }
+        .tab-button {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            padding: .5rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: .9rem;
+        }
+        .tab-button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+        .panel.hidden { display: none; }
+
+        .panel-toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        #questions-search {
+            flex: 1;
+            min-width: 200px;
+            padding: .55rem .8rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: .9rem;
+        }
+        .stats { color: var(--text-muted); font-size: .85rem; white-space: nowrap; }
+
+        .btn {
+            display: inline-block;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            padding: .5rem .9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: .85rem;
+            text-decoration: none;
+        }
+        .btn:hover { filter: brightness(.97); }
+        .btn[hidden] { display: none; }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: #fff; border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+        .btn-ghost { background: transparent; }
+
+        .questions-list { display: flex; flex-direction: column; gap: .5rem; }
+        .question-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: .5rem .7rem;
+            box-shadow: var(--shadow);
+        }
+        .question-index { color: var(--text-muted); font-size: .8rem; min-width: 1.6rem; text-align: right; }
+        .question-input { flex: 1; border: 1px solid transparent; padding: .4rem .5rem; border-radius: 6px; font-size: .9rem; background: transparent; }
+        .question-input:hover, .question-input:focus { border-color: var(--border); background: var(--bg); outline: none; }
+        .question-alt-input { width: 110px; border: 1px solid var(--border); padding: .35rem .5rem; border-radius: 6px; font-size: .8rem; color: var(--text-muted); }
+        .bonus-toggle { display: flex; align-items: center; gap: .3rem; font-size: .8rem; color: var(--text-muted); white-space: nowrap; }
+        .empty-state { color: var(--text-muted); text-align: center; padding: 2rem 0; }
+
+        .profils-list { display: flex; flex-direction: column; gap: 1rem; }
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .profile-header { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .5rem; }
+        .profile-expand-toggle {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            padding: .25rem .4rem;
+            order: -1;
+        }
+        .profile-expand-toggle:hover { color: var(--text); }
+        .profile-name { flex: 1; padding: .5rem .7rem; border: 1px solid var(--border); border-radius: 8px; font-size: .95rem; font-weight: 600; }
+        .profile-meta-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .6rem; }
+        .profile-category {
+            border: none;
+            border-radius: 999px;
+            padding: .3rem .8rem;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #fff;
+            background: var(--cat-color, var(--text-muted));
+            cursor: pointer;
+        }
+        .profile-accepted { display: flex; align-items: center; gap: .3rem; font-size: .85rem; color: var(--text-muted); white-space: nowrap; }
+        .profile-date-label { display: flex; align-items: center; gap: .3rem; font-size: .78rem; color: var(--text-muted); white-space: nowrap; margin-left: auto; }
+        .profile-date-input { border: 1px solid var(--border); border-radius: 6px; padding: .2rem .4rem; font-size: .78rem; font-family: inherit; color: var(--text); }
+        .profile-note { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: .5rem .6rem; font-family: inherit; font-size: .85rem; resize: vertical; margin-bottom: .6rem; }
+
+        .profile-questions summary { cursor: pointer; font-size: .85rem; color: var(--text-muted); margin-bottom: .5rem; }
+        .profile-question-actions { display: flex; gap: .5rem; margin: .5rem 0; }
+        .profile-question-list {
+            max-height: 260px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .4rem .6rem;
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+            background: var(--bg);
+        }
+        .profile-question-item { display: flex; align-items: flex-start; gap: .5rem; font-size: .85rem; padding: .2rem 0; }
+        .profile-question-item .badge {
+            background: #fef3c7;
+            color: #92400e;
+            font-size: .7rem;
+            padding: .05rem .4rem;
+            border-radius: 999px;
+            margin-left: .3rem;
+        }
+
+        .profile-output { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: .6rem; font-family: inherit; font-size: .85rem; resize: vertical; }
+        .profile-output:placeholder-shown {
+            border: 2px solid #f59e0b;
+            background: #fffbeb;
+            animation: profile-output-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes profile-output-pulse {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(245, 158, 11, .15); }
+            50% { box-shadow: 0 0 0 7px rgba(245, 158, 11, .35); }
+        }
+
+        .profile-complete-answers { display: flex; gap: .6rem; align-items: flex-start; margin-bottom: 1.25rem; }
+        .profile-complete-answers textarea {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .5rem .6rem;
+            font-family: inherit;
+            font-size: .85rem;
+            resize: vertical;
+        }
+        .profile-complete-answers .btn { white-space: nowrap; }
+
+        .toast {
+            position: fixed;
+            bottom: 1.25rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1f2937;
+            color: #fff;
+            padding: .6rem 1.1rem;
+            border-radius: 8px;
+            font-size: .85rem;
+            opacity: 0;
+            transition: opacity .2s ease, transform .2s ease;
+            pointer-events: none;
+        }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        #data { display: none }
+
+        .landing { height: 100vh; display: flex; flex-direction: column; padding: 2rem; }
+        .landing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .landing-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+        .landing-top h1 { margin: 0; font-size: 1.3rem; }
+        .landing-top .btn { text-decoration: none; white-space: nowrap; }
+        .landing-add-profile { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: .6rem; }
+        .landing-add-profile input, .landing-add-profile textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .6rem .7rem;
+            font-family: inherit;
+            font-size: .9rem;
+        }
+        .landing-add-profile textarea { resize: vertical; }
+        .landing-toggle-columns { display: block; width: 100%; text-align: center; margin-bottom: 1rem; }
+        .landing-data-btn {
+            display: block;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 14px;
+        }
+        .landing-columns { display: flex; gap: 1.5rem; flex: 1; min-height: 0; }
+        .landing-columns[hidden] { display: none; }
+        .landing-section { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .landing-section-btn {
+            display: block;
+            text-align: center;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 600;
+            padding: .6rem .8rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .landing-section-btn:hover { background: var(--primary-dark); }
+        .landing-filter { display: block; width: 100%; padding: .5rem .7rem; border: 1px solid var(--border); font-size: .85rem; }
+        .landing-list { list-style: none; margin: 0; padding: 0; flex: 1; min-height: 0; overflow-y: auto; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+        .landing-list li { border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+        .landing-list li:last-child { border-bottom: none; }
+        .landing-list a { display: block; padding: .55rem .7rem; color: var(--text); text-decoration: none; font-size: .85rem; }
+        .landing-list a:hover { background: var(--bg); }
+        .landing-list li a:first-child { flex: 1; min-width: 0; }
+        .landing-list .landing-read-btn {
+            flex: none;
+            margin: .3rem .5rem;
+            padding: .35rem .7rem;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .landing-list .landing-read-btn:hover { background: var(--primary-dark); }
+        .landing-list .landing-empty { display: block; padding: .55rem .7rem; color: var(--text-muted); font-size: .85rem; }
+
+        .question-page { min-height: 100vh; display: flex; padding: 2rem; }
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            align-self: flex-start;
+        }
+        .question-page-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+        .question-page-header h2 { margin: 0; font-size: 1.15rem; flex: 1; }
+        .question-page-header .btn { text-decoration: none; white-space: nowrap; }
+        .question-alt-badge { font-size: .78rem; font-weight: 600; color: var(--primary); background: #eef2ff; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
+        .question-nav { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
+        .question-nav .btn { text-decoration: none; white-space: nowrap; }
+        .question-nav .btn.disabled { pointer-events: none; opacity: .4; }
+        #question-filter, #profile-filter { flex: 1; padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 8px; font-size: .9rem; }
+        .question-table { width: 100%; border-collapse: collapse; }
+        .question-table th, .question-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--border); font-size: .88rem; }
+        .question-table th { color: var(--text-muted); text-transform: uppercase; font-size: .75rem; letter-spacing: .03em; }
+        .question-table tbody tr:hover { background: var(--bg); }
+        .question-table td a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+        }
+        .question-table td a::after { content: '→'; opacity: 0; transform: translateX(-4px); transition: opacity .15s ease, transform .15s ease; }
+        .question-table td a:hover { color: var(--primary-dark); text-decoration: underline; }
+        .question-table td a:hover::after { opacity: 1; transform: translateX(0); }
+        .question-empty-answer { color: var(--text-muted); font-style: italic; }
+        .btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
+        .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .reading-mode { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2rem; padding: 3rem 1rem; }
+        .reading-name { font-size: .85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+        .reading-mode #reading-alt { font-size: 1.1rem; padding: .5rem 1.1rem; }
+        .reading-question { font-size: 1.6rem; font-weight: 700; max-width: 760px; min-height: 4.8rem; display: flex; align-items: center; justify-content: center; }
+        .reading-answer { font-size: 1.6rem; line-height: 1.6; color: var(--text); max-width: 760px; white-space: pre-wrap; margin: .5rem 0; min-height: 15rem; display: flex; align-items: center; justify-content: center; }
+        .reading-controls { display: flex; align-items: center; gap: 1.5rem; margin-top: 1rem; }
+        .reading-controls .btn-small { font-size: .78rem; padding: .35rem .7rem; }
+        .reading-jump-controls { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+        .reading-jump-controls .btn-small { font-size: .78rem; padding: .35rem .7rem; }
+        .reading-favorite.active { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+        .reading-summary { max-width: 760px; width: 100%; text-align: left; }
+        .reading-summary h3 { text-align: center; margin: 0 0 1rem; font-size: 1.1rem; }
+        .reading-summary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .75rem; max-height: 50vh; overflow-y: auto; }
+        .reading-summary-list li { border: 1px solid var(--border); border-radius: 8px; padding: .6rem .8rem; background: var(--surface); }
+        .reading-summary-list li strong { display: block; margin-bottom: .25rem; }
+        .reading-summary-list .reading-summary-empty { border: none; text-align: center; color: var(--text-muted); background: transparent; }
+
+        @media (max-width: 700px) {
+            main { padding: 1rem; }
+            .app-header { padding: .7rem 1rem; gap: .6rem; }
+            .app-header h1 { font-size: 1rem; width: 100%; }
+            .tabs { order: 3; width: 100%; }
+            .tab-button { padding: .45rem .8rem; font-size: .82rem; }
+
+            .question-row { flex-wrap: wrap; }
+            .question-input { flex-basis: 100%; order: -1; }
+            .question-alt-input { width: auto; flex: 1; }
+
+            .profile-date-label { margin-left: 0; }
+            .profile-header .btn { flex: 1; text-align: center; }
+
+            .landing { height: auto; min-height: 100vh; padding: 1rem; }
+            .landing-card { padding: 1.25rem; }
+            .landing-top { flex-wrap: wrap; }
+            .landing-data-btn { font-size: 1.15rem; padding: 1rem 1.25rem; }
+            .landing-columns { flex-direction: column; }
+            .landing-list { max-height: 45vh; }
+
+            .question-page { padding: 1rem; }
+            .question-card { padding: 1.25rem; }
+            .question-page-header { flex-wrap: wrap; }
+            .question-nav { flex-wrap: wrap; }
+            #question-filter, #profile-filter { flex-basis: 100%; order: 3; }
+
+            .table-scroll { overflow-x: visible; }
+            .question-table { min-width: 0; }
+            .question-table thead { display: none; }
+            .question-table tbody { display: block; }
+            .question-table tr {
+                display: block;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: .6rem .7rem;
+                margin-bottom: .6rem;
+                background: var(--surface);
+            }
+            .question-table td {
+                display: block;
+                padding: .3rem 0;
+                border-bottom: none;
+                font-size: .85rem;
+            }
+            .question-table td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: .7rem;
+                text-transform: uppercase;
+                letter-spacing: .03em;
+                color: var(--text-muted);
+                margin-bottom: .1rem;
+            }
+            .profile-answers-table td[data-label="Alt"] { display: none; }
+
+            .reading-mode { padding: 2rem .5rem; gap: 1.25rem; }
+            .reading-question { font-size: 1.25rem; min-height: 3.3rem; }
+            .reading-answer { font-size: 1.1rem; min-height: 20.3rem; }
+            .reading-mode #reading-alt { font-size: .95rem; padding: .4rem .8rem; }
+            .reading-controls { flex-wrap: wrap; justify-content: center; gap: .75rem; }
+        }
+    </style>
+</head>
+<body>
+    <button type="button" class="theme-toggle" id="theme-toggle" title="Basculer le mode sombre">🌙</button>
+    <div id="default" class="landing" style="display: none;">
+        <div class="landing-card">
+            <div class="landing-top">
+                <h1>Questionnaire Noesis</h1>
+            </div>
+            <div class="landing-add-profile">
+                <input type="text" id="landing-profile-name" placeholder="Nom du profil" required>
+                <textarea id="landing-profile-note" rows="2" placeholder="Note (optionnel)"></textarea>
+                <textarea id="landing-profile-answers" rows="3" placeholder="👉 Colle les réponses ici" required></textarea>
+                <button type="button" class="btn btn-primary landing-data-btn" id="landing-add-profile-btn">+ Ajouter un profil</button>
+            </div>
+            <button type="button" class="btn btn-ghost landing-toggle-columns" id="landing-toggle-columns">Afficher plus de fonctionnalités</button>
+            <div class="landing-columns" id="landing-columns" hidden>
+                <div class="landing-section">
+                    <div class="landing-section-btn" href="?page=profils">Voir les profils</div>
+                    <input type="search" id="landing-profils-filter" class="landing-filter" placeholder="Filtrer les profils...">
+                    <ul id="landing-profils-list" class="landing-list"></ul>
+                </div>
+                <div class="landing-section">
+                    <div class="landing-section-btn" href="?page=questions">Voir les questions</div>
+                    <input type="search" id="landing-questions-filter" class="landing-filter" placeholder="Filtrer les questions...">
+                    <ul id="landing-questions-list" class="landing-list"></ul>
+                </div>
+            </div>
+            <a class="btn btn-ghost" href="?page=data" style="margin-top: 1rem; align-self: center;">Accéder aux données</a>
+        </div>
+    </div>
+    <div id="question" class="question-page" style="display: none;">
+        <div class="question-card">
+            <div class="question-page-header">
+                <a class="btn btn-ghost" href="?page=default">← Menu</a>
+                <h2 id="question-title"></h2>
+                <span id="question-alt" class="question-alt-badge" title="Version résumée de la question" hidden></span>
+            </div>
+            <div class="question-nav">
+                <a id="question-previous" class="btn" href="#">← Précédente</a>
+                <input type="search" id="question-filter" placeholder="Filtrer par nom ou réponse...">
+                <a id="question-next" class="btn" href="#">Suivante →</a>
+            </div>
+            <div class="table-scroll">
+                <table class="question-table">
+                    <thead><tr><th>Nom</th><th>Réponse</th></tr></thead>
+                    <tbody id="question-answer"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="profile" class="question-page" style="display: none;">
+        <div class="question-card">
+            <div class="question-page-header">
+                <a class="btn btn-ghost" href="?page=default">← Menu</a>
+                <h2 id="profile-title"></h2>
+                <button type="button" class="btn btn-primary" id="profile-reading-toggle">Lire les questions</button>
+            </div>
+            <div class="profile-complete-answers" id="profile-complete-answers">
+                <textarea id="profile-complete-input" rows="6" placeholder="✍️ Colle toutes les réponses ici"></textarea>
+            </div>
+            <div id="profile-complete-anchor-top"></div>
+            <div id="profile-table-view">
+                <div class="question-nav">
+                    <a id="profile-previous" class="btn" href="#">← Précédent</a>
+                    <input type="search" id="profile-filter" placeholder="Filtrer par question ou réponse...">
+                    <a id="profile-next" class="btn" href="#">Suivant →</a>
+                </div>
+                <div class="table-scroll">
+                    <table class="question-table profile-answers-table">
+                        <thead><tr><th>Alt</th><th>Question</th><th>Réponse</th><th>Favori</th></tr></thead>
+                        <tbody id="profile-answers"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="profile-reading" class="reading-mode" hidden>
+                <div class="reading-name" id="reading-name"></div>
+                <span id="reading-alt" class="question-alt-badge" title="Version résumée de la question" hidden></span>
+                <div class="reading-question" id="reading-question"></div>
+                <div class="reading-answer" id="reading-answer"></div>
+                <div id="reading-summary" class="reading-summary" hidden>
+                    <h3>Questions favorites</h3>
+                    <ul id="reading-summary-list" class="reading-summary-list"></ul>
+                </div>
+                <div class="reading-controls">
+                    <button type="button" class="btn btn-small" id="reading-prev">← Précédente</button>
+                    <button type="button" class="btn reading-favorite" id="reading-favorite">☆ Favori</button>
+                    <button type="button" class="btn btn-primary" id="reading-next">Suivante →</button>
+                </div>
+                <div class="reading-jump-controls">
+                    <button type="button" class="btn btn-ghost btn-small" id="reading-first">⏮ Début</button>
+                    <button type="button" class="btn btn-ghost btn-small" id="reading-back10">- 10</button>
+                    <button type="button" class="btn btn-ghost btn-small" id="reading-forward10">+ 10</button>
+                    <button type="button" class="btn btn-ghost btn-small" id="reading-last">Fin ⏭</button>
+                </div>
+                <button type="button" class="btn btn-ghost" id="reading-exit">Quitter la lecture</button>
+                <div id="profile-complete-anchor-bottom"></div>
+            </div>
+        </div>
+    </div>
+    <div id ="data" class="containerDiv">
+        <header class="app-header">
+            <h1>Questionnaire Noesis</h1>
+            <nav class="tabs">
+                <button type="button" class="tab-button" data-action="switch-tab" data-tab="questions">Banque de questions</button>
+                <button type="button" class="tab-button active" data-action="switch-tab" data-tab="profils">Profils</button>
+            </nav>
+            <a class="btn btn-ghost" href="?page=default">Retour au menu</a>
+            <button type="button" class="btn btn-ghost" data-action="reset-defaults">Réinitialiser</button>
+        </header>
+    
+        <main>
+            <section id="panel-questions" class="panel hidden">
+                <div class="panel-toolbar">
+                    <input type="search" id="questions-search" placeholder="Rechercher une question...">
+                    <span id="questions-stats" class="stats"></span>
+                    <button type="button" class="btn btn-primary" data-action="add-question">+ Ajouter une question</button>
+                </div>
+                <div id="questions-list" class="questions-list"></div>
+            </section>
+    
+            <section id="panel-profils" class="panel">
+                <div class="panel-toolbar">
+                    <span id="profils-stats" class="stats"></span>
+                    <button type="button" class="btn btn-primary" data-action="add-profile">+ Ajouter un profil</button>
+                </div>
+                <div id="profils-list" class="profils-list"></div>
+            </section>
+        </main>
+    
+        <div id="toast" class="toast" hidden></div>
+    </div>
+
+
+
+    <script>
+        var THEME_KEY = 'theme';
+        function applyTheme(theme){
+            document.documentElement.setAttribute('data-theme', theme);
+            var toggleBtn = document.getElementById('theme-toggle');
+            if (toggleBtn) toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        (function initTheme(){
+            var stored = localStorage.getItem(THEME_KEY);
+            var theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(theme);
+        })();
+        document.getElementById('theme-toggle').addEventListener('click', function(){
+            var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(THEME_KEY, current);
+            applyTheme(current);
+        });
+
+        function getUri() {
+            var uriGets = {};
+            var uri = window.location.href;
+            var queryString = uri.split('?')[1] || '';
+            var queryParams = queryString.split('&');
+            for (var i = 0; i < queryParams.length; i++) {
+                var param = queryParams[i].split('=');
+                uriGets[param[0]] = param[1] ? decodeURIComponent(param[1]) : '';
+            }
+
+            if (!("page" in uriGets)) {
+                uriGets["page"] = "default";
+            }
+
+            return uriGets;
+        }
+
+        document.getElementById(getUri()["page"]).style.display = "block";
+
+        var questionsDefault = [
+            {
+                "question": "1  Qu’est-ce qui t’amène sur ce serveur en particulier ?",
+                "bonus": false,
+                "alt": "Pourquoi t'es la"
+            },
+            {
+                "question": "2  Qu'apportes-tu aux serveurs que tu rejoins de manière générale ?",
+                "bonus": false,
+                "alt": "Ce que tu apportes"
+            },
+            {
+                "question": "3  Quelle est ta taille ?",
+                "bonus": false,
+                "alt": "Taille"
+            },
+            {
+                "question": "4  Quel âge as-tu ?",
+                "bonus": false,
+                "alt": "Âge"
+            },
+            {
+                "question": "5  Quels sont tes hobbies et tes passions ?",
+                "bonus": false,
+                "alt": "Hobbies et passions"
+            },
+            {
+                "question": "6  Ta plus grande qualité et pourquoi ?",
+                "bonus": false,
+                "alt": "Qualité"
+            },
+            {
+                "question": "7  Ton plus grand défaut et pourquoi ?",
+                "bonus": false,
+                "alt": "Défaut"
+            },
+            {
+                "question": "8  Y a-t-il une incohérence entre ce que les gens pensent de toi et ce que tu penses être ?",
+                "bonus": false,
+                "alt": "Incohérence"
+            },
+            {
+                "question": "9  Quelles sont les qualités qui t'attirent chez les autres ?",
+                "bonus": false,
+                "alt": "Qualités chez les autres"
+            },
+            {
+                "question": "10 Quel est le pire surnom qu’on t’ait donné ?",
+                "bonus": false,
+                "alt": "Pire surnom"
+            },
+            {
+                "question": "11  Quels sont les sujets dont tu adores parler et au contraire ceux que tu n'aimes pas ou dont tu as peur de parler ?",
+                "bonus": false,
+                "alt": "Sujets de conversation"
+            },
+            {
+                "question": "12  Quelles sont les choses de ta vie dont tu ne pourrais pas te passer et pour quelles raisons ?",
+                "bonus": false,
+                "alt": "Choses indispensables"
+            },
+            {
+                "question": "13 La planète entière prend tes goûts et tes habitudes de consommation, quel produit disparait instantanément ?",
+                "bonus": false,
+                "alt": "Produit à faire disparaître"
+            },
+            {
+                "question": "14  Es-tu plutôt du genre à fuir les problèmes ou à les affronter ?",
+                "bonus": false,
+                "alt": "Réaction face aux problèmes"
+            },
+            {
+                "question": "15  Un homme te bouscule dans la rue et ne s'excuse même pas, comment réagis-tu en te relevant ?",
+                "bonus": false,
+                "alt": "Mec qui te bouscule"
+            },
+            {
+                "question": "16 As-tu déjà fait du chantage émotionnel ?",
+                "bonus": false,
+                "alt": "Chantage émotionnel"
+            },
+            {
+                "question": "17 Qui t’a le plus influencé dans ta vie ?",
+                "bonus": false,
+                "alt": "Personne influente"
+            },
+            {
+                "question": "18 As-tu déjà ri d’une personne handicapée ?",
+                "bonus": false,
+                "alt": "Rire d'une personne handicapée"
+            },
+            {
+                "question": "19 Quel est le pire cadeau qu’on ne t’ait jamais fait ?",
+                "bonus": false,
+                "alt": "Pire cadeau"
+            },
+            {
+                "question": "20 Quel est le meilleur choix que tu penses avoir fait dans ta vie ?",
+                "bonus": false,
+                "alt": "Meilleur choix"
+            },
+            {
+                "question": "21 Quel est le plus mauvais choix que tu penses avoir fait dans ta vie ?",
+                "bonus": false,
+                "alt": "Pire choix"
+            },
+            {
+                "question": "22 Quels sont les sujets avec lesquels tu n'es pas ouvert(e) au débat ?",
+                "bonus": false,
+                "alt": "Sujets fermés au débat"
+            },
+            {
+                "question": "23 Le compliment qui te flatte le plus ?",
+                "bonus": false,
+                "alt": "Compliment préféré"
+            },
+            {
+                "question": "25 L'insulte qui te blesse le plus ?",
+                "bonus": false,
+                "alt": "Insulte la plus blessante"
+            },
+            {
+                "question": "26 Es-tu tatoué(e), percé(e) ou les deux ?",
+                "bonus": false,
+                "alt": "Tatouages et piercings"
+            },
+            {
+                "question": "27 As-tu des complexes physiques ?",
+                "bonus": false,
+                "alt": "Complexes physiques"
+            },
+            {
+                "question": "28 As-tu des complexes mentaux ?",
+                "bonus": false,
+                "alt": "Complexes mentaux"
+            },
+            {
+                "question": "29 Par quoi es-tu obsédé ?",
+                "bonus": false,
+                "alt": "Obsessions"
+            },
+            {
+                "question": "30 Décris-nous ton meilleur souvenir ?",
+                "bonus": false,
+                "alt": "Meilleur souvenir"
+            },
+            {
+                "question": "31 Quelle est la chose la plus idiote que tu aies faite par égo ?",
+                "bonus": false,
+                "alt": "Acte idiot par égo"
+            },
+            {
+                "question": "32 Quel est l'acte le plus pénible que tu aies fait par gentillesse ?",
+                "bonus": false,
+                "alt": "Acte pénible par gentillesse"
+            },
+            {
+                "question": "33 Quel est l'acte le plus malveillant que tu aies fait par jalousie/haine",
+                "bonus": false,
+                "alt": "Acte malveillant par jalousie/haine"
+            },
+            {
+                "question": "34 Si tu pouvais jouer dans n’importe quel film, lequel choisirais-tu ?",
+                "bonus": false,
+                "alt": "Film préféré pour jouer"
+            },
+            {
+                "question": "35 Raconte nous ce que serait la journée de tes rêves ?",
+                "bonus": false,
+                "alt": "Journée de rêve"
+            },
+            {
+                "question": "36  Quels sont les objectifs que tu devrais réaliser pour avoir le sentiment d'avoir réussi ta vie ?",
+                "bonus": false,
+                "alt": "Objectifs de vie"
+            },
+            {
+                "question": "37 Si tu devais écrire un roman, quel en serait le genre et quelles en seraient les idées principales ?",
+                "bonus": false,
+                "alt": "Roman et idées principales"
+            },
+            {
+                "question": "38 Quelle est ton expérience la plus marquante avec un(e) inconnu(e) ?",
+                "bonus": false,
+                "alt": "Expérience marquante avec un inconnu"
+            },
+            {
+                "question": "39 Te trouves-tu intelligent(e) ?",
+                "bonus": false,
+                "alt": "Intelligence perçue"
+            },
+            {
+                "question": "40 Comment mesures-tu l'intelligence d'un individu ?",
+                "bonus": false,
+                "alt": "Mesure de l'intelligence"
+            },
+            {
+                "question": "41 Quelle est ta blague préférée ?",
+                "bonus": false,
+                "alt": "Blague préférée"
+            },
+            {
+                "question": "42 Es-tu lâche ?",
+                "bonus": false,
+                "alt": "Lâcheté"
+            },
+            {
+                "question": "43 T'est-il déjà arrivé de faire semblant de ne pas entendre quelqu'un qui t'avait insulté ?",
+                "bonus": false,
+                "alt": "Faire semblant de ne pas entendre une insulte"
+            },
+            {
+                "question": "44 Quel est le mensonge le plus bizarre que tu aies raconté quand tu étais enfant ?",
+                "bonus": false,
+                "alt": "Mensonge d'enfance"
+            },
+            {
+                "question": "45 Quelle est la remarque la plus vexante qu’un ami t’ait faite ?",
+                "bonus": false,
+                "alt": "Remarque vexante d'un ami"
+            },
+            {
+                "question": "46 Quelle est la façon la plus stupide dont tu t’es blessé ou dont tu es tombé ?",
+                "bonus": false,
+                "alt": "Blessure stupide"
+            },
+            {
+                "question": "47 Dissocies-tu l'œuvre de l'artiste ?",
+                "bonus": false,
+                "alt": "Dissociation œuvre/artiste"
+            },
+            {
+                "question": "48 Quelle est l'origine de ton pseudo ?",
+                "bonus": false,
+                "alt": "Origine du pseudo"
+            },
+            {
+                "question": "49 Plutôt suiveur(se) ou meneur(se) ?",
+                "bonus": false,
+                "alt": "Suiveur ou meneur"
+            },
+            {
+                "question": "50  Contrôles-tu facilement tes émotions ?",
+                "bonus": false,
+                "alt": "Contrôle des émotions"
+            },
+            {
+                "question": "51  Ce que tu adores chez toi ?",
+                "bonus": false,
+                "alt": "Adores chez toi"
+            },
+            {
+                "question": "52 Ce que tu détestes chez toi ?",
+                "bonus": false,
+                "alt": "Détestes chez toi"
+            },
+            {
+                "question": "53 Es-tu sportif(ve) ?",
+                "bonus": false,
+                "alt": "Pratique sportive"
+            },
+            {
+                "question": "54 Quand tu vas mal, acheter quelque chose te redonne-t-il un peu le moral ?",
+                "bonus": false,
+                "alt": "Achat pour remonter le moral"
+            },
+            {
+                "question": "55 Es-tu matérialiste ?",
+                "bonus": false,
+                "alt": "Matérialisme"
+            },
+            {
+                "question": "56 Raconte-nous un de tes cauchemars récurrents (ou un cauchemar marquant).",
+                "bonus": false,
+                "alt": "Cauchemar récurrent"
+            },
+            {
+                "question": "57 As-tu déjà tué quelqu'un ?",
+                "bonus": false,
+                "alt": "Tué quelqu'un"
+            },
+            {
+                "question": "58 Raconte-nous la dernière fois où tu aurais mieux fait de te taire.",
+                "bonus": false,
+                "alt": "Dernière fois où tu aurais mieux fait de te taire"
+            },
+            {
+                "question": "59 Selon toi est-il malsain de mélanger sexe et travail ?",
+                "bonus": false,
+                "alt": "Mélanger sexe et travail"
+            },
+            {
+                "question": "60 Quelle est la plus belle chose que tu aies faite par amour ?",
+                "bonus": false,
+                "alt": "Plus belle chose faite par amour"
+            },
+            {
+                "question": "61 Tu es sur la route et tu vois une voiture arrêtée avec des feux de détresse car elle a un problème, est-ce que tu t'arrêtes ou tu accélères ?",
+                "bonus": false,
+                "alt": "Voiture arrêtée avec feux de détresse"
+            },
+            {
+                "question": "62 Quelles sont tes plus grands projets d'avenir ?",
+                "bonus": false,
+                "alt": "Projets d'avenir"
+            },
+            {
+                "question": "63 Quelles sont tes phobies ?",
+                "bonus": false,
+                "alt": "Phobies"
+            },
+            {
+                "question": "64 Quand tu fais les courses, regardes-tu les prix ?",
+                "bonus": false,
+                "alt": "Regarde le prix en courses"
+            },
+            {
+                "question": "65 À quelle classe sociale appartiens-tu ?",
+                "bonus": false,
+                "alt": "Classe sociale"
+            },
+            {
+                "question": "66 Que penses tu donner comme première impression avec ton profil discord ?",
+                "bonus": false,
+                "alt": "Première impression profil discord"
+            },
+            {
+                "question": "67 Quel est le top 3 des choses qui t'irritent le plus ?",
+                "bonus": false,
+                "alt": "Top 3 irritations"
+            },
+            {
+                "question": "68 Comment ce sont passées tes années collège/lycée ?",
+                "bonus": false,
+                "alt": "Années collège/lycée"
+            },
+            {
+                "question": "69  Quelle est ta position préférée ?",
+                "bonus": false,
+                "alt": "Position préférée"
+            },
+            {
+                "question": "70 As-tu des regrets ?",
+                "bonus": false,
+                "alt": "Regrets"
+            },
+            {
+                "question": "71 As-tu peur des aiguilles ?",
+                "bonus": false,
+                "alt": "Peur des aiguilles"
+            },
+            {
+                "question": "72 Te considères-tu comme une personne normale ?",
+                "bonus": false,
+                "alt": "Personne normale"
+            },
+            {
+                "question": "73  Quelle habitude humaine trouves-tu ridicule quand tu y réfléchis ?",
+                "bonus": false,
+                "alt": "Habitude humaine ridicule"
+            },
+            {
+                "question": "74 Comment définis-tu le réel ?",
+                "bonus": false,
+                "alt": "Définition du réel"
+            },
+            {
+                "question": "75  Quand te sens-tu le plus en vie ?",
+                "bonus": false,
+                "alt": "Ce qui te fait vibrer"
+            },
+            {
+                "question": "76  Ton top 3 des choses/comportements les plus tue-l'amour ?",
+                "bonus": false,
+                "alt": "Top 3 tue-l'amour"
+            },
+            {
+                "question": "77  Quelle est la première chose que tu ferais si tu étais du sexe opposé ?",
+                "bonus": false,
+                "alt": "Première chose si sexe opposé"
+            },
+            {
+                "question": "78 Si tu pouvais totalement effacer un évènement de ta vie, lequel ce serait ?",
+                "bonus": false,
+                "alt": "Évènement à effacer"
+            },
+            {
+                "question": "79  Quel trait de caractère aimerais-tu avoir ?",
+                "bonus": false,
+                "alt": "Trait de caractère désiré"
+            },
+            {
+                "question": "80 Quelle musique as-tu honte d'écouter ?",
+                "bonus": false,
+                "alt": "Musique honteuse"
+            },
+            {
+                "question": "81 Quel serait ton 11ème commandement ?",
+                "bonus": false,
+                "alt": "11ème commandement"
+            },
+            {
+                "question": "82  Qu'est-ce-que l'art selon toi ?",
+                "bonus": false,
+                "alt": "Définition de l'art"
+            },
+            {
+                "question": "83 Quelles sont les premières réflexions ou questions que tu reçois quand tu parles de tes études/travail ?",
+                "bonus": false,
+                "alt": "Réactions sur études/travail"
+            },
+            {
+                "question": "84 T'arrives-t-il de dire la vérité dans le seul but de faire du mal à quelqu'un ?",
+                "bonus": false,
+                "alt": "Dire la vérité pour faire du mal"
+            },
+            {
+                "question": "85 As-tu déjà fait quelque chose d'idiot uniquement pour plaire à une femme ou un homme ?",
+                "bonus": false,
+                "alt": "Faire quelque chose d'idiot pour plaire"
+            },
+            {
+                "question": "86 Raconte-nous ton pire souvenir ?",
+                "bonus": false,
+                "alt": "Pire souvenir"
+            },
+            {
+                "question": "87  Es-tu quelqu'un d'attentif ?",
+                "bonus": false,
+                "alt": "Être attentif"
+            },
+            {
+                "question": "88 As-tu remarqué qu'il n'y avait pas de question 24 ?",
+                "bonus": false,
+                "alt": "Question 24"
+            },
+            {
+                "question": "89 Quel est le plus gros échec que tu as eu dans ta vie ?",
+                "bonus": false,
+                "alt": "Plus gros échec"
+            },
+            {
+                "question": "90 Quelle est la chose que tu as accomplie qui te rend le plus fier(e) ?",
+                "bonus": false,
+                "alt": "Ce dont tu es le plus fier"
+            },
+            {
+                "question": "91 As-tu menti durant ce questionnaire ?",
+                "bonus": false,
+                "alt": "Menti durant le questionnaire"
+            },
+            {
+                "question": "92 Quelle image penses‑tu avoir renvoyée de toi avec tes réponses au questionnaire ?",
+                "bonus": false,
+                "alt": "Image renvoyée de soi"
+            },
+            {
+                "question": "93 : Trouve moi 5 devinette dont la réponse est : la femme",
+                "bonus": true,
+                "alt": "Devinettes sur la femme"
+            },
+            {
+                "question": "94 : as-tu déja racketter quelqu'un ?",
+                "bonus": true,
+                "alt": "Racketter quelqu'un"
+            },
+            {
+                "question": "95 : te trouve-tu assez joli pour faire du cinéma ?",
+                "bonus": true,
+                "alt": "Apparence pour le cinéma"
+            },
+            {
+                "question": "96 : la dernière fois que tu regrette de ne pas avoir agi",
+                "bonus": true,
+                "alt": "Regret de ne pas avoir agi"
+            },
+            {
+                "question": "97 : as-tu un casier vierge ?",
+                "bonus": true,
+                "alt": "Casier judiciaire vierge"
+            },
+            {
+                "question": "98 : si l'on devais crée un musée de toi a quoi ressemblerais t'il",
+                "bonus": true,
+                "alt": "Musée de soi"
+            },
+            {
+                "question": "99 : Questions a laquelle tu as le devoir de te lacher !  qu'est-ce-qui t'enerve chez les gens raconte nous ?",
+                "bonus": true,
+                "alt": "Ce qui énerve chez les gens"
+            },
+            {
+                "question": "100 : Cite-nous quelque chose qui ne fait rire personne sauf toi",
+                "bonus": true,
+                "alt": "Quelque chose qui ne fait rire personne sauf toi"
+            },
+            {
+                "question": "101 : fais nous ta bucket liste",
+                "bonus": true,
+                "alt": "Bucket liste"
+            },
+            {
+                "question": "102 : qu'est ce que les gens comprennent mal à propos de toi ?",
+                "bonus": true,
+                "alt": "Ce que les gens comprennent mal à propos de toi"
+            },
+            {
+                "question": "103 : qu'elle sont tes fleurs préféré ?",
+                "bonus": true,
+                "alt": "Fleurs préférées"
+            },
+            {
+                "question": "104 : connais-tu mirabeau ?",
+                "bonus": true,
+                "alt": "Connaissance de Mirabeau"
+            },
+            {
+                "question": "105 : Si tu devais faire un top de tes meilleures expériences sur des serveurs Discord, ça donnerait quoi ?",
+                "bonus": true,
+                "alt": "Meilleures expériences sur Discord"
+            },
+            {
+                "question": "106 : selon-toi a quoi peux t'on mesurer la valeur d'une personnes ?",
+                "bonus": true,
+                "alt": "Mesurer la valeur d'une personne"
+            },
+            {
+                "question": "107 : Raconte nous les minutes qui ont été les plus longue de ta vie (en terme de ressentie)",
+                "bonus": true,
+                "alt": "Minutes les plus longues"
+            },
+            {
+                "question": "108 : Quelle est la plus belle fois où on t'a dis \"je t'aime\" ?",
+                "bonus": true,
+                "alt": "Plus belle fois ou on t'a dit je t'aime"
+            },
+            {
+                "question": "109 :  as-tu un casier vierge ?",
+                "bonus": true,
+                "alt": "Casier vierge"
+            },
+            {
+                "question": "110 :  Cite-nous quelque chose qui ne fait rire personne sauf toi ?",
+                "bonus": true,
+                "alt": "Quelque chose qui ne fait rire personne sauf toi"
+            },
+            {
+                "question": "111 :  fais nous ta bucket liste ?",
+                "bonus": true,
+                "alt": "Bucket liste 2"
+            },
+            {
+                "question": "112 :  qu'est ce que les gens comprennent mal à propos de toi ?",
+                "bonus": true,
+                "alt": "Ce que les gens comprennent mal à propos de toi 2"
+            },
+            {
+                "question": "113 : Si tu devais faire un top de tes meilleures expériences sur des serveurs Discord, ça donnerait quoi ?",
+                "bonus": true,
+                "alt": "Meilleures expériences sur Discord 2"
+            },
+            {
+                "question": "114 : raconte nous des vérités sur toi que tu as longtemps refusé d'admettre ?",
+                "bonus": true,
+                "alt": "Vérités sur soi"
+            },
+            {
+                "question": "115 : La choses la plus ridicule pour laquelle tu as pleurer ?",
+                "bonus": true,
+                "alt": "Chose ridicule pour laquelle tu as pleuré"
+            },
+            {
+                "question": "116 : donne nous des phrases que tu recevrais en tant que premier message après être arriver sur un serveur discord qui te ferais instantanément partir ?",
+                "bonus": true,
+                "alt": "Phrases de premier message sur Discord"
+            },
+            {
+                "question": "117 : Si tu avais la bombe A quelle est le premier endroit que tu exploserais ?",
+                "bonus": true,
+                "alt": "Premier endroit à exploser avec la bombe A"
+            },
+            {
+                "question": "118 : Ton plus gros mensonges ?",
+                "bonus": true,
+                "alt": "Plus gros mensonges"
+            },
+            {
+                "question": "119 : sur quoi les gens te jalousent le plus ?",
+                "bonus": true,
+                "alt": "Ce dont les gens te jalousent le plus"
+            },
+            {
+                "question": "120 : ton travail ou tes études te rende t'il heureux ?",
+                "bonus": true,
+                "alt": "Travail ou études et bonheur"
+            },
+            {
+                "question": "121 : parle nous d'une promesse que tu n'a jamais tenu",
+                "bonus": true,
+                "alt": "Promesse non tenue"
+            },
+            {
+                "question": "122 : ya t'il des erreurs assez importante que tu as répété plusieurs fois ?",
+                "bonus": true,
+                "alt": "Erreurs répétées"
+            }
+        ];
+
+        var profilsDefault = [
+            {
+                "name": "NekShor",
+                "questionsText": "",
+                "favoriteIds": [],
+                "note": "",
+                "accepted": false,
+                "category": "cat1"
+            }
+        ];
+
+        // Couleurs figées par catégorie — remplacer label/color pour personnaliser (à remplacer par les 6 vraies catégories)
+        var CATEGORIES = [
+            { id: 'cat1', label: 'Catégorie 1', color: '#ef4444' },
+            { id: 'cat2', label: 'Catégorie 2', color: '#f97316' },
+            { id: 'cat3', label: 'Catégorie 3', color: '#eab308' },
+            { id: 'cat4', label: 'Catégorie 4', color: '#22c55e' },
+            { id: 'cat5', label: 'Catégorie 5', color: '#3b82f6' },
+            { id: 'cat6', label: 'Catégorie 6', color: '#a855f7' }
+        ];
+
+        function getCategory(id){
+            return CATEGORIES.find(function(c){ return c.id === id; }) || CATEGORIES[0];
+        }
+
+        var STORAGE_KEY_QUESTIONS = 'questions';
+        var STORAGE_KEY_PROFILS = 'profils';
+
+        function generateId(){
+            if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+            return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+        }
+
+        function escapeHtml(value){
+            return String(value).replace(/[&<>"']/g, function(ch){
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+            });
+        }
+
+        function ensureTrailingNewline(text){
+            if (!text) return '';
+            return text.replace(/\s+$/, '') + '\n';
+        }
+
+        function readJson(key){
+            try { return JSON.parse(localStorage.getItem(key)); }
+            catch (e) { return null; }
+        }
+
+        function normalizeQuestions(list){
+            return (Array.isArray(list) ? list : []).map(function(q){
+                return { id: q.id || generateId(), question: q.question || '', bonus: !!q.bonus, alt: q.alt || '' };
+            });
+        }
+
+        function normalizeProfils(list){
+            return (Array.isArray(list) ? list : []).map(function(p){
+                var favoriteIds = Array.isArray(p.favoriteIds) ? p.favoriteIds
+                    : (Array.isArray(p.questionsFavori) ? p.questionsFavori : []);
+                return {
+                    id: p.id || generateId(),
+                    name: p.name || '',
+                    favoriteIds: favoriteIds.slice(),
+                    questionsText: p.questionsText || '',
+                    note: p.note || '',
+                    accepted: !!p.accepted,
+                    category: p.category || CATEGORIES[0].id,
+                    createdAt: p.createdAt ? toDateOnly(p.createdAt) : todayDateString()
+                };
+            });
+        }
+
+        function todayDateString(){
+            var d = new Date();
+            var month = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return d.getFullYear() + '-' + month + '-' + day;
+        }
+
+        function toDateOnly(value){
+            if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+            return todayDateString();
+        }
+
+        function loadState(){
+            var storedQuestions = readJson(STORAGE_KEY_QUESTIONS);
+            var storedProfils = readJson(STORAGE_KEY_PROFILS);
+            return {
+                questions: normalizeQuestions(storedQuestions && storedQuestions.length ? storedQuestions : questionsDefault),
+                profils: normalizeProfils(storedProfils && storedProfils.length ? storedProfils : profilsDefault)
+            };
+        }
+
+        var state = loadState();
+        // UI-only state, intentionally not persisted to localStorage
+        var ui = { searchTerm: '', openProfileIds: new Set(), expandedProfileIds: new Set() };
+        var expandProfileIdFromUri = getUri()["expand"];
+        if (expandProfileIdFromUri) ui.expandedProfileIds.add(expandProfileIdFromUri);
+
+        function persist(){
+            localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(state.questions));
+            localStorage.setItem(STORAGE_KEY_PROFILS, JSON.stringify(state.profils));
+        }
+
+        function findQuestion(id){ return state.questions.find(function(q){ return q.id === id; }); }
+        function findProfile(id){ return state.profils.find(function(p){ return p.id === id; }); }
+
+        var toastEl = document.getElementById('toast');
+        var toastTimer = null;
+        function showToast(message){
+            toastEl.textContent = message;
+            toastEl.hidden = false;
+            requestAnimationFrame(function(){ toastEl.classList.add('visible'); });
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function(){
+                toastEl.classList.remove('visible');
+                setTimeout(function(){ toastEl.hidden = true; }, 200);
+            }, 2200);
+        }
+
+        var questionsListEl = document.getElementById('questions-list');
+        var questionsStatsEl = document.getElementById('questions-stats');
+        var questionsSearchEl = document.getElementById('questions-search');
+        var profilsListEl = document.getElementById('profils-list');
+        var profilsStatsEl = document.getElementById('profils-stats');
+
+        function updateQuestionsStats(){
+            var total = state.questions.length;
+            var bonusCount = state.questions.filter(function(q){ return q.bonus; }).length;
+            questionsStatsEl.textContent = total + ' question' + (total > 1 ? 's' : '') + ' (' + bonusCount + ' bonus)';
+        }
+
+        function renderQuestions(){
+            updateQuestionsStats();
+            var term = ui.searchTerm.trim().toLowerCase();
+            var html = state.questions.map(function(q, index){
+                if (term && q.question.toLowerCase().indexOf(term) === -1) return '';
+                return '' +
+                    '<div class="question-row" data-id="' + q.id + '">' +
+                        '<span class="question-index">' + (index + 1) + '</span>' +
+                        '<input type="text" class="question-input" data-action="edit-question" data-id="' + q.id + '" value="' + escapeHtml(q.question) + '">' +
+                        '<input type="text" class="question-alt-input" data-action="edit-question-alt" data-id="' + q.id + '" value="' + escapeHtml(q.alt) + '" placeholder="Alt (1-2 mots)">' +
+                        '<label class="bonus-toggle"><input type="checkbox" data-action="toggle-bonus" data-id="' + q.id + '" ' + (q.bonus ? 'checked' : '') + '> Bonus</label>' +
+                        '<button type="button" class="btn btn-danger" data-action="delete-question" data-id="' + q.id + '">Supprimer</button>' +
+                    '</div>';
+            }).join('');
+            questionsListEl.innerHTML = html || '<p class="empty-state">Aucune question ne correspond à la recherche.</p>';
+        }
+
+        function renderProfileCard(profile){
+            var isOpen = false;
+            var isExpanded = ui.expandedProfileIds.has(profile.id);
+            var category = getCategory(profile.category);
+            var categoryOptions = CATEGORIES.map(function(c){
+                return '<option value="' + c.id + '" ' + (c.id === profile.category ? 'selected' : '') + '>' + escapeHtml(c.label) + '</option>';
+            }).join('');
+            var questionItems = state.questions.map(function(q, index){
+                var checked = profile.favoriteIds.indexOf(q.id) !== -1;
+                return '' +
+                    '<label class="profile-question-item">' +
+                        '<input type="checkbox" data-action="toggle-favorite" data-profile-id="' + profile.id + '" data-question-id="' + q.id + '" ' + (checked ? 'checked' : '') + '>' +
+                        '<span>' + (index + 1) + '. ' + escapeHtml(q.question) + (q.bonus ? '<span class="badge">Bonus</span>' : '') + '</span>' +
+                    '</label>';
+            }).join('');
+
+            return '' +
+                '<article class="profile-card" data-id="' + profile.id + '">' +
+                    '<div class="profile-header">' +
+                        '<button type="button" class="profile-expand-toggle" data-action="toggle-profile-expand" data-id="' + profile.id + '" title="' + (isExpanded ? 'Réduire' : 'Développer') + '">' + (isExpanded ? '▾' : '▸') + '</button>' +
+                        '<input type="text" class="profile-name" data-action="edit-profile-name" data-id="' + profile.id + '" value="' + escapeHtml(profile.name) + '" placeholder="Nom du profil">' +
+                        '<a class="btn btn-primary" href="?page=profile&id=' + encodeURIComponent(profile.name) + '&mode=reading" title="Lire les questions">📖 Lire les questions</a>' +
+                        '<button type="button" class="btn btn-danger" data-action="delete-profile" data-id="' + profile.id + '">Supprimer</button>' +
+                    '</div>' +
+                    '<div class="profile-body" ' + (isExpanded ? '' : 'hidden') + '>' +
+                        '<div class="profile-meta-row">' +
+                            '<select class="profile-category" data-action="edit-profile-category" data-id="' + profile.id + '" style="--cat-color:' + category.color + '">' + categoryOptions + '</select>' +
+                            '<label class="profile-accepted"><input type="checkbox" data-action="toggle-accepted" data-id="' + profile.id + '" ' + (profile.accepted ? 'checked' : '') + '> Accepté</label>' +
+                            '<label class="profile-date-label">Ajouté le <input type="date" class="profile-date-input" data-action="edit-profile-created" data-id="' + profile.id + '" value="' + profile.createdAt + '"></label>' +
+                        '</div>' +
+                        '<textarea class="profile-note" rows="2" data-action="edit-profile-note" data-id="' + profile.id + '" placeholder="Note...">' + escapeHtml(profile.note) + '</textarea>' +
+                        '<details class="profile-questions" data-profile-id="' + profile.id + '" ' + (isOpen ? 'open' : '') + '>' +
+                            '<summary>Questions sélectionnées (' + profile.favoriteIds.length + '/' + state.questions.length + ')</summary>' +
+                            '<div class="profile-question-actions">' +
+                                '<button type="button" class="btn btn-ghost" data-action="select-all-favorites" data-id="' + profile.id + '">Tout cocher</button>' +
+                                '<button type="button" class="btn btn-ghost" data-action="select-no-favorites" data-id="' + profile.id + '">Tout décocher</button>' +
+                            '</div>' +
+                            '<div class="profile-question-list">' + questionItems + '</div>' +
+                        '</details>' +
+                        '<textarea class="profile-output" rows="6" data-action="edit-generated-text" data-id="' + profile.id + '" placeholder="👉 Colle toutes les réponses ici">' + escapeHtml(ensureTrailingNewline(profile.questionsText)) + '</textarea>' +
+                    '</div>' +
+                '</article>';
+        }
+
+        function updateProfileSummary(profileId){
+            var details = profilsListEl.querySelector('details[data-profile-id="' + profileId + '"]');
+            var profile = findProfile(profileId);
+            if (!details || !profile) return;
+            details.querySelector('summary').textContent = 'Questions sélectionnées (' + profile.favoriteIds.length + '/' + state.questions.length + ')';
+        }
+
+        function focusLastInput(container, selector){
+            var inputs = container.querySelectorAll(selector);
+            if (inputs.length) inputs[inputs.length - 1].focus();
+        }
+
+        function focusProfileField(profileId, selector){
+            var card = profilsListEl.querySelector('.profile-card[data-id="' + profileId + '"]');
+            var field = card && card.querySelector(selector);
+            if (field) { field.focus(); if (field.select) field.select(); }
+        }
+
+        function switchTab(tabName){
+            document.querySelectorAll('.tab-button').forEach(function(btn){
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.getElementById('panel-questions').classList.toggle('hidden', tabName !== 'questions');
+            document.getElementById('panel-profils').classList.toggle('hidden', tabName !== 'profils');
+        }
+
+        // --- Action handlers ---
+
+        function addQuestion(){
+            state.questions.push({ id: generateId(), question: '', bonus: false });
+            persist();
+            renderAll();
+            focusLastInput(questionsListEl, '.question-input');
+        }
+
+        function deleteQuestion(id){
+            if (!confirm('Supprimer cette question ?')) return;
+            state.questions = state.questions.filter(function(q){ return q.id !== id; });
+            state.profils.forEach(function(p){
+                p.favoriteIds = p.favoriteIds.filter(function(fid){ return fid !== id; });
+            });
+            persist();
+            renderAll();
+        }
+
+        function addProfile(name, questionsText, note){
+            var profile = { id: generateId(), name: name || '', favoriteIds: [], questionsText: questionsText || '', note: note || '', accepted: false, category: CATEGORIES[0].id, createdAt: todayDateString() };
+            state.profils.push(profile);
+            ui.openProfileIds.add(profile.id);
+            ui.expandedProfileIds.add(profile.id);
+            persist();
+            renderProfils();
+            focusProfileField(profile.id, name ? '.profile-output' : '.profile-name');
+            return profile;
+        }
+
+        function deleteProfile(id){
+            if (!confirm('Supprimer ce profil ?')) return;
+            state.profils = state.profils.filter(function(p){ return p.id !== id; });
+            ui.openProfileIds.delete(id);
+            persist();
+            renderProfils();
+        }
+
+        function resetDefaults(){
+            if (!confirm('Réinitialiser toutes les données (questions et profils) aux valeurs par défaut ? Cette action est irréversible.')) return;
+            localStorage.removeItem(STORAGE_KEY_QUESTIONS);
+            localStorage.removeItem(STORAGE_KEY_PROFILS);
+            state = loadState();
+            ui.openProfileIds.clear();
+            ui.searchTerm = '';
+            questionsSearchEl.value = '';
+            persist();
+            renderAll();
+            showToast('Données réinitialisées');
+        }
+
+        function renderAll(){
+            renderQuestions();
+            renderProfils();
+            renderLandingLists();
+        }
+
+        function renderProfils(){
+            profilsStatsEl.textContent = state.profils.length + ' profil' + (state.profils.length > 1 ? 's' : '');
+            var sortedProfils = state.profils.slice().reverse(); // last added first
+            profilsListEl.innerHTML = sortedProfils.map(renderProfileCard).join('') || '<p class="empty-state">Aucun profil pour le moment.</p>';
+            profilsListEl.querySelectorAll('.profile-output').forEach(function(ta){ ta.scrollTop = ta.scrollHeight; });
+        }
+
+        function renderLandingLists(){
+            var landingProfilsEl = document.getElementById('landing-profils-list');
+            var landingQuestionsEl = document.getElementById('landing-questions-list');
+            var profilsTerm = document.getElementById('landing-profils-filter').value.trim().toLowerCase();
+            var questionsTerm = document.getElementById('landing-questions-filter').value.trim().toLowerCase();
+
+            landingProfilsEl.innerHTML = state.profils.slice().reverse().filter(function(p){
+                return !profilsTerm || (p.name || '').toLowerCase().indexOf(profilsTerm) !== -1;
+            }).map(function(p){
+                return '<li><a href="?page=profile&id=' + encodeURIComponent(p.name) + '">' + escapeHtml(p.name || '(Sans nom)') + '</a><a class="landing-read-btn" href="?page=profile&id=' + encodeURIComponent(p.name) + '&mode=reading" title="Lire les questions">📖 Lire les questions</a></li>';
+            }).join('') || '<li><span class="landing-empty">Aucun profil</span></li>';
+
+            landingQuestionsEl.innerHTML = state.questions.filter(function(q){ return !q.bonus; }).filter(function(q){
+                return !questionsTerm || q.question.toLowerCase().indexOf(questionsTerm) !== -1;
+            }).map(function(q){
+                return '<li><a href="?page=question&id=' + getQuestionNumber(q) + '">' + escapeHtml(q.question) + '</a></li>';
+            }).join('') || '<li><span class="landing-empty">Aucune question</span></li>';
+        }
+
+        document.getElementById('landing-profils-filter').addEventListener('input', renderLandingLists);
+        document.getElementById('landing-questions-filter').addEventListener('input', renderLandingLists);
+
+        document.getElementById('landing-toggle-columns').addEventListener('click', function(){
+            var columns = document.getElementById('landing-columns');
+            columns.hidden = !columns.hidden;
+            this.textContent = columns.hidden ? 'Afficher plus d\'infos' : 'Masquer les infos';
+        });
+
+        // --- Event delegation ---
+
+        document.addEventListener('click', function(e){
+            var target = e.target.closest('[data-action]');
+            if (!target) return;
+            var id = target.dataset.id;
+            switch (target.dataset.action) {
+                case 'switch-tab': switchTab(target.dataset.tab); break;
+                case 'reset-defaults': resetDefaults(); break;
+                case 'add-question': addQuestion(); break;
+                case 'delete-question': deleteQuestion(id); break;
+                case 'add-profile': addProfile(); break;
+                case 'delete-profile': deleteProfile(id); break;
+                case 'toggle-profile-expand':
+                    if (ui.expandedProfileIds.has(id)) ui.expandedProfileIds.delete(id); else ui.expandedProfileIds.add(id);
+                    renderProfils();
+                    break;
+                case 'select-all-favorites':
+                    var allSelected = findProfile(id);
+                    if (allSelected) {
+                        allSelected.favoriteIds = state.questions.map(function(q){ return q.id; });
+                        persist();
+                        renderProfils();
+                    }
+                    break;
+                case 'select-no-favorites':
+                    var noneSelected = findProfile(id);
+                    if (noneSelected) {
+                        noneSelected.favoriteIds = [];
+                        persist();
+                        renderProfils();
+                    }
+                    break;
+            }
+        });
+
+        document.addEventListener('change', function(e){
+            var target = e.target;
+            if (target.matches('[data-action="toggle-bonus"]')) {
+                var question = findQuestion(target.dataset.id);
+                if (question) {
+                    question.bonus = target.checked;
+                    persist();
+                    updateQuestionsStats();
+                }
+            } else if (target.matches('[data-action="toggle-favorite"]')) {
+                var profile = findProfile(target.dataset.profileId);
+                if (profile) {
+                    var qid = target.dataset.questionId;
+                    var idx = profile.favoriteIds.indexOf(qid);
+                    if (target.checked && idx === -1) profile.favoriteIds.push(qid);
+                    if (!target.checked && idx !== -1) profile.favoriteIds.splice(idx, 1);
+                    persist();
+                    updateProfileSummary(target.dataset.profileId);
+                }
+            } else if (target.matches('[data-action="toggle-accepted"]')) {
+                var acceptedProfile = findProfile(target.dataset.id);
+                if (acceptedProfile) { acceptedProfile.accepted = target.checked; persist(); }
+            } else if (target.matches('[data-action="edit-profile-category"]')) {
+                var categorizedProfile = findProfile(target.dataset.id);
+                if (categorizedProfile) {
+                    categorizedProfile.category = target.value;
+                    target.style.setProperty('--cat-color', getCategory(target.value).color);
+                    persist();
+                }
+            } else if (target.matches('[data-action="edit-profile-created"]')) {
+                var datedProfile = findProfile(target.dataset.id);
+                if (datedProfile && target.value) { datedProfile.createdAt = target.value; persist(); }
+            }
+        });
+
+        document.addEventListener('input', function(e){
+            var target = e.target;
+            if (target === questionsSearchEl) {
+                ui.searchTerm = target.value;
+                renderQuestions();
+            } else if (target.matches('[data-action="edit-question"]')) {
+                var question = findQuestion(target.dataset.id);
+                if (question) {
+                    question.question = target.value;
+                    persist();
+                    renderProfils(); // keep favorite lists in sync with the edited wording
+                }
+            } else if (target.matches('[data-action="edit-question-alt"]')) {
+                var altQuestion = findQuestion(target.dataset.id);
+                if (altQuestion) { altQuestion.alt = target.value; persist(); }
+            } else if (target.matches('[data-action="edit-profile-name"]')) {
+                var profile = findProfile(target.dataset.id);
+                if (profile) { profile.name = target.value; persist(); }
+            } else if (target.matches('[data-action="edit-profile-note"]')) {
+                var noteProfile = findProfile(target.dataset.id);
+                if (noteProfile) { noteProfile.note = target.value; persist(); }
+            } else if (target.matches('[data-action="edit-generated-text"]')) {
+                var editedProfile = findProfile(target.dataset.id);
+                if (editedProfile) { editedProfile.questionsText = target.value; persist(); }
+            }
+        });
+
+        document.addEventListener('toggle', function(e){
+            var details = e.target;
+            if (!details.matches || !details.matches('details.profile-questions')) return;
+            var id = details.dataset.profileId;
+            if (details.open) ui.openProfileIds.add(id); else ui.openProfileIds.delete(id);
+        }, true);
+
+        persist(); // ensure migrated/normalized data (with ids) is saved back
+        renderAll();
+
+        function splitByNumberIncreasing(texte){
+            var resultats = [];
+            let indexActuel = 0;
+  
+            // Expression régulière pour trouver le premier numéro (ex: "1 ", "1\t", "1-", etc.)
+            const matchInitial = texte.match(/(\d+)[\s:\-–.]/);
+            if (!matchInitial) return resultats;
+
+            let numeroCourant = parseInt(matchInitial[1], 10);
+
+            while (indexActuel < texte.length) {
+                // 1. Cherche la position du numéro courant (ex: "1 ")
+                const regexCourant = new RegExp(`(?:^|\\n)\\s*${numeroCourant}[\\s:\\-–.]`, 'g');
+                regexCourant.lastIndex = indexActuel;
+                const matchStart = regexCourant.exec(texte);
+
+                if (!matchStart) {
+                // Si le numéro courant n'est pas trouvé, on tente le numéro suivant
+                numeroCourant++;
+                if (numeroCourant > 200) break; // Sécurité anti-boucle infinie
+                continue;
+                }
+
+                const startPos = matchStart.index;
+
+                // 2. Cherche le prochain numéro supérieur disponible dans le texte (N+1, N+2, ...)
+                let nextPos = texte.length;
+                let prochainNumeroTrouve = null;
+
+                for (let testNext = numeroCourant + 1; testNext <= numeroCourant + 50; testNext++) {
+                const regexNext = new RegExp(`(?:^|\\n)\\s*${testNext}[\\s:\\-–.]`, 'g');
+                regexNext.lastIndex = startPos + matchStart[0].length;
+                const matchNext = regexNext.exec(texte);
+
+                if (matchNext) {
+                    nextPos = matchNext.index;
+                    prochainNumeroTrouve = testNext;
+                    break;
+                }
+                }
+
+                // 3. Extrait le bloc complet (Question + Réponse)
+                const blocComplet = texte.substring(startPos, nextPos).trim();
+                
+                // 4. Sépare la ligne de la question du reste (la réponse)
+                const lignes = blocComplet.split('\n');
+                var questionLigne, reponse;
+                if (lignes.length > 1) {
+                    // Plusieurs lignes : on suppose que la 1ère ligne est la question recopiée
+                    questionLigne = lignes[0].trim();
+                    reponse = lignes.slice(1).join('\n').trim();
+                } else {
+                    // Une seule ligne : "N réponse" sans question recopiée, tout après le numéro est la réponse
+                    const seuleLigneMatch = lignes[0].match(/^\d+[\s:\-–.]+(.*)$/);
+                    questionLigne = '';
+                    reponse = seuleLigneMatch ? seuleLigneMatch[1].trim() : '';
+                }
+
+                resultats.push({
+                numero: numeroCourant,
+                questionComplet: questionLigne,
+                reponse: reponse
+                });
+
+                // Avance vers le prochain bloc
+                indexActuel = nextPos;
+                if (prochainNumeroTrouve) {
+                numeroCourant = prochainNumeroTrouve;
+                } else {
+                break; // Aucun numéro suivant trouvé, fin du texte
+                }
+            }
+
+            return resultats;
+        }
+
+        var answers = {};
+        function findAnswerIntoText(){
+            state.profils.forEach(function(profil){
+                var texteQuestion = profil.questionsText || '';
+                answers[profil.name] = texteQuestion ? splitByNumberIncreasing(texteQuestion) : [];
+            });
+        }
+        findAnswerIntoText();
+
+        function getQuestionNumber(question){
+            return question.question.split(' ')[0];
+        }
+
+        var questionAnswerRows = [];
+
+        function renderQuestionTable(term){
+            term = (term || '').trim().toLowerCase();
+            var bodyEl = document.getElementById('question-answer');
+            var filtered = questionAnswerRows.filter(function(row){
+                if (!term) return true;
+                return row.name.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1;
+            });
+            bodyEl.innerHTML = filtered.map(function(row){
+                return '<tr><td data-label="Nom"><a href="?page=profile&id=' + encodeURIComponent(row.name) + '">' + escapeHtml(row.name) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td></tr>';
+            }).join('') || '<tr><td colspan="2" class="question-empty-answer">Aucun résultat.</td></tr>';
+        }
+
+        function updateQuestionNavLink(el, question){
+            if (question) {
+                el.href = '?page=question&id=' + getQuestionNumber(question);
+                el.classList.remove('disabled');
+            } else {
+                el.href = '#';
+                el.classList.add('disabled');
+            }
+        }
+
+        function showAnswerQuestion(){
+            var questionId = getUri()["id"];
+            var titleEl = document.getElementById('question-title');
+            var altEl = document.getElementById('question-alt');
+            var filterEl = document.getElementById('question-filter');
+            var index = state.questions.findIndex(function(q){ return getQuestionNumber(q) === questionId; });
+            var question = index !== -1 ? state.questions[index] : null;
+
+            if (!question) {
+                titleEl.textContent = 'Question introuvable';
+                altEl.hidden = true;
+                questionAnswerRows = [];
+                renderQuestionTable('');
+                updateQuestionNavLink(document.getElementById('question-previous'), null);
+                updateQuestionNavLink(document.getElementById('question-next'), null);
+                return;
+            }
+
+            titleEl.textContent = question.question;
+            altEl.textContent = question.alt ? ('Résumé : ' + question.alt) : '';
+            altEl.hidden = !question.alt;
+            questionAnswerRows = state.profils.slice().reverse().map(function(p){ // last added first
+                var answer = (answers[p.name] || []).find(function(a){ return a.numero.toString() === questionId.toString(); });
+                return { name: p.name, reponse: answer ? answer.reponse : '' };
+            });
+            filterEl.value = '';
+            renderQuestionTable('');
+
+            updateQuestionNavLink(document.getElementById('question-previous'), state.questions[index - 1]);
+            updateQuestionNavLink(document.getElementById('question-next'), state.questions[index + 1]);
+        }
+        showAnswerQuestion();
+
+        document.getElementById('question-filter').addEventListener('input', function(e){
+            renderQuestionTable(e.target.value);
+        });
+
+        document.querySelectorAll('#question-previous, #question-next').forEach(function(el){
+            el.addEventListener('click', function(e){
+                if (el.classList.contains('disabled')) e.preventDefault();
+            });
+        });
+
+        var profileAnswerRows = [];
+
+        function renderProfileTable(term){
+            term = (term || '').trim().toLowerCase();
+            var bodyEl = document.getElementById('profile-answers');
+            var filtered = profileAnswerRows.filter(function(row){
+                if (!term) return true;
+                return row.question.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1 || row.alt.toLowerCase().indexOf(term) !== -1;
+            });
+            bodyEl.innerHTML = filtered.map(function(row){
+                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.numero) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
+            }).join('') || '<tr><td colspan="4" class="question-empty-answer">Aucun résultat.</td></tr>';
+        }
+
+        function updateProfileNavLink(el, profile){
+            if (profile) {
+                el.href = '?page=profile&id=' + encodeURIComponent(profile.name);
+                el.classList.remove('disabled');
+            } else {
+                el.href = '#';
+                el.classList.add('disabled');
+            }
+        }
+
+        var currentProfile = null;
+
+        function showProfileAnswers(){
+            var profileName = getUri()["id"];
+            var titleEl = document.getElementById('profile-title');
+            var filterEl = document.getElementById('profile-filter');
+            var index = state.profils.findIndex(function(p){ return p.name === profileName; });
+            var profile = index !== -1 ? state.profils[index] : null;
+            currentProfile = profile;
+
+            if (!profile) {
+                titleEl.textContent = 'Profil introuvable';
+                profileAnswerRows = [];
+                renderProfileTable('');
+                updateProfileNavLink(document.getElementById('profile-previous'), null);
+                updateProfileNavLink(document.getElementById('profile-next'), null);
+                return;
+            }
+
+            titleEl.textContent = profile.name || '(Sans nom)';
+            profileAnswerRows = (answers[profile.name] || []).map(function(a){
+                var question = findQuestionByNumero(a.numero);
+                var favorite = !!(question && profile.favoriteIds.indexOf(question.id) !== -1);
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, alt: question ? question.alt : '', favorite: favorite };
+            });
+            filterEl.value = '';
+            renderProfileTable('');
+
+            var completeInput = document.getElementById('profile-complete-input');
+            completeInput.value = ensureTrailingNewline(profile.questionsText);
+            completeInput.scrollTop = completeInput.scrollHeight;
+
+            updateProfileNavLink(document.getElementById('profile-previous'), state.profils[index - 1]);
+            updateProfileNavLink(document.getElementById('profile-next'), state.profils[index + 1]);
+        }
+        showProfileAnswers();
+        if (getUri()["mode"] === "reading") enterReadingMode();
+
+        document.getElementById('profile-filter').addEventListener('input', function(e){
+            renderProfileTable(e.target.value);
+        });        document.querySelectorAll('#profile-previous, #profile-next').forEach(function(el){
+            el.addEventListener('click', function(e){
+                if (el.classList.contains('disabled')) e.preventDefault();
+            });
+        });
+
+        // --- Reading mode: focus on one profile answer at a time ---
+
+        var readingIndex = 0;
+
+        function findQuestionByNumero(numero){
+            return state.questions.find(function(q){ return getQuestionNumber(q) === numero.toString(); });
+        }
+
+        function renderFavoriteSummary(){
+            var listEl = document.getElementById('reading-summary-list');
+            var favoriteIds = currentProfile ? currentProfile.favoriteIds : [];
+            var favoriteRows = profileAnswerRows.filter(function(row){
+                var question = findQuestionByNumero(row.numero);
+                return question && favoriteIds.indexOf(question.id) !== -1;
+            });
+            listEl.innerHTML = favoriteRows.map(function(row){
+                return '<li><strong>' + escapeHtml(row.question) + '</strong>' + escapeHtml(row.reponse || 'Aucune réponse trouvée.') + '</li>';
+            }).join('') || '<li class="reading-summary-empty">Aucune question favorite pour ce profil.</li>';
+        }
+
+        function renderReadingMode(){
+            var nameEl = document.getElementById('reading-name');
+            var altEl = document.getElementById('reading-alt');
+            var questionEl = document.getElementById('reading-question');
+            var answerEl = document.getElementById('reading-answer');
+            var summaryEl = document.getElementById('reading-summary');
+            var favBtn = document.getElementById('reading-favorite');
+            var prevBtn = document.getElementById('reading-prev');
+            var nextBtn = document.getElementById('reading-next');
+            var firstBtn = document.getElementById('reading-first');
+            var back10Btn = document.getElementById('reading-back10');
+            var forward10Btn = document.getElementById('reading-forward10');
+            var lastBtn = document.getElementById('reading-last');
+
+            nameEl.textContent = currentProfile ? (currentProfile.name || '(Sans nom)') : '';
+
+            var atSummary = readingIndex >= profileAnswerRows.length;
+            firstBtn.disabled = readingIndex <= 0;
+            back10Btn.disabled = readingIndex <= 0;
+            lastBtn.disabled = atSummary;
+            forward10Btn.disabled = atSummary;
+
+            if (atSummary) {
+                altEl.hidden = true;
+                questionEl.hidden = true;
+                answerEl.hidden = true;
+                favBtn.hidden = true;
+                summaryEl.hidden = false;
+                renderFavoriteSummary();
+                prevBtn.disabled = false;
+                nextBtn.disabled = true;
+                return;
+            }
+
+            var row = profileAnswerRows[readingIndex];
+            if (!row) return;
+
+            altEl.hidden = false;
+            questionEl.hidden = false;
+            answerEl.hidden = false;
+            favBtn.hidden = false;
+            summaryEl.hidden = true;
+
+            altEl.textContent = row.alt ? ('Résumé : ' + row.alt) : '';
+            altEl.hidden = !row.alt;
+            questionEl.textContent = row.question;
+            answerEl.textContent = row.reponse || 'Aucune réponse trouvée.';
+
+            prevBtn.disabled = readingIndex <= 0;
+            nextBtn.disabled = false;
+
+            var question = findQuestionByNumero(row.numero);
+            var isFavorite = !!(question && currentProfile && currentProfile.favoriteIds.indexOf(question.id) !== -1);
+            favBtn.textContent = (isFavorite ? '★' : '☆') + ' Favori';
+            favBtn.classList.toggle('active', isFavorite);
+        }
+
+        function jumpReading(newIndex){
+            readingIndex = Math.max(0, Math.min(profileAnswerRows.length, newIndex));
+            renderReadingMode();
+        }
+
+        function refreshProfileAnswerRows(){
+            if (!currentProfile) return;
+            profileAnswerRows = (answers[currentProfile.name] || []).map(function(a){
+                var question = findQuestionByNumero(a.numero);
+                var favorite = !!(question && currentProfile.favoriteIds.indexOf(question.id) !== -1);
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, alt: question ? question.alt : '', favorite: favorite };
+            });
+            renderProfileTable(document.getElementById('profile-filter').value);
+        }
+
+        function enterReadingMode(){
+            if (!profileAnswerRows.length) { showToast('Aucune question à afficher pour ce profil.'); return; }
+            readingIndex = 0;
+            document.getElementById('profile-table-view').hidden = true;
+            document.getElementById('profile-reading').hidden = false;
+            document.getElementById('profile-reading-toggle').hidden = true;
+            document.getElementById('profile-complete-anchor-bottom').appendChild(document.getElementById('profile-complete-answers'));
+            var completeInputReading = document.getElementById('profile-complete-input');
+            completeInputReading.scrollTop = completeInputReading.scrollHeight;
+            renderReadingMode();
+        }
+
+        function exitReadingMode(){
+            document.getElementById('profile-reading').hidden = true;
+            document.getElementById('profile-table-view').hidden = false;
+            document.getElementById('profile-reading-toggle').hidden = false;
+            document.getElementById('profile-complete-anchor-top').appendChild(document.getElementById('profile-complete-answers'));
+            var completeInputTable = document.getElementById('profile-complete-input');
+            completeInputTable.scrollTop = completeInputTable.scrollHeight;
+        }
+
+        document.getElementById('profile-reading-toggle').addEventListener('click', enterReadingMode);
+        document.getElementById('reading-exit').addEventListener('click', exitReadingMode);
+
+        var completeInputTimer = null;
+        document.getElementById('profile-complete-input').addEventListener('input', function(){
+            var input = this;
+            input.scrollTop = input.scrollHeight;
+            clearTimeout(completeInputTimer);
+            completeInputTimer = setTimeout(function(){
+                if (!currentProfile) return;
+                currentProfile.questionsText = ensureTrailingNewline(input.value.trim());
+                persist();
+                findAnswerIntoText();
+                refreshProfileAnswerRows();
+                if (!document.getElementById('profile-reading').hidden) renderReadingMode();
+            }, 500);
+        });
+
+        document.getElementById('reading-prev').addEventListener('click', function(){
+            if (readingIndex > 0) { readingIndex--; renderReadingMode(); }
+        });
+
+        document.getElementById('reading-next').addEventListener('click', function(){
+            if (readingIndex < profileAnswerRows.length) { readingIndex++; renderReadingMode(); }
+        });
+
+        document.getElementById('reading-first').addEventListener('click', function(){ jumpReading(0); });
+        document.getElementById('reading-last').addEventListener('click', function(){ jumpReading(profileAnswerRows.length); });
+        document.getElementById('reading-back10').addEventListener('click', function(){ jumpReading(readingIndex - 10); });
+        document.getElementById('reading-forward10').addEventListener('click', function(){ jumpReading(readingIndex + 10); });
+
+        document.getElementById('reading-favorite').addEventListener('click', function(){
+            if (!currentProfile) return;
+            var row = profileAnswerRows[readingIndex];
+            var question = row && findQuestionByNumero(row.numero);
+            if (!question) return;
+            var idx = currentProfile.favoriteIds.indexOf(question.id);
+            if (idx === -1) currentProfile.favoriteIds.push(question.id); else currentProfile.favoriteIds.splice(idx, 1);
+            persist();
+            renderReadingMode();
+        });
+
+        // --- Swipe navigation: swipe left = next, swipe right = previous ---
+
+        function enableSwipeNav(rootEl, prevEl, nextEl){
+            if (!rootEl) return;
+            var startX = 0, startY = 0, tracking = false, decided = false, isHorizontal = false;
+
+            rootEl.addEventListener('touchstart', function(e){
+                if (e.target.closest('input, textarea, select')) { tracking = false; return; }
+                var touch = e.touches[0];
+                startX = touch.clientX;
+                startY = touch.clientY;
+                tracking = true;
+                decided = false;
+                isHorizontal = false;
+            }, { passive: true });
+
+            rootEl.addEventListener('touchmove', function(e){
+                if (!tracking) return;
+                var touch = e.touches[0];
+                var dx = touch.clientX - startX;
+                var dy = touch.clientY - startY;
+                if (!decided && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+                    decided = true;
+                    isHorizontal = Math.abs(dx) > Math.abs(dy);
+                }
+                // Once a horizontal swipe is detected, stop the browser's own scroll/edge-navigation gestures from stealing it.
+                if (isHorizontal && e.cancelable) e.preventDefault();
+            }, { passive: false });
+
+            rootEl.addEventListener('touchend', function(e){
+                if (!tracking) return;
+                tracking = false;
+                var touch = e.changedTouches[0];
+                var dx = touch.clientX - startX;
+                var dy = touch.clientY - startY;
+                if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+                if (dx < 0) { if (nextEl) nextEl.click(); } else { if (prevEl) prevEl.click(); }
+            }, { passive: true });
+        }
+
+        enableSwipeNav(document.getElementById('question'), document.getElementById('question-previous'), document.getElementById('question-next'));
+        enableSwipeNav(document.getElementById('profile-table-view'), document.getElementById('profile-previous'), document.getElementById('profile-next'));
+        enableSwipeNav(document.getElementById('profile-reading'), document.getElementById('reading-prev'), document.getElementById('reading-next'));
+
+        document.getElementById('landing-add-profile-btn').addEventListener('click', function(){
+            var nameInput = document.getElementById('landing-profile-name');
+            var answersInput = document.getElementById('landing-profile-answers');
+            var noteInput = document.getElementById('landing-profile-note');
+            var name = nameInput.value.trim();
+            if (!name) { showToast('Entre un nom avant de créer le profil.'); nameInput.focus(); return; } // no name, no profile created
+            var answers = answersInput.value.trim();
+            if (!answers) { showToast('Colle les réponses avant de créer le profil.'); answersInput.focus(); return; } // answers required
+            var profile = addProfile(name, answers, noteInput.value.trim());
+            window.location.href = '?page=profile&id=' + encodeURIComponent(profile.name);
+        });
+    </script>
+</body>
+</html>
