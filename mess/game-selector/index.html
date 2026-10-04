@@ -538,14 +538,80 @@
 
         .form-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 0.6rem;
             grid-column: 1 / -1;
         }
 
-        @media (max-width: 600px) {
+        /* ---------- Responsive ---------- */
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.85rem 3rem;
+            }
+
             header {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 1.25rem;
+            }
+
+            header .header-text h1 {
+                font-size: 1.5rem;
+            }
+
+            #filters,
+            #view-admin {
+                padding: 1.1rem;
+            }
+
+            #filters-form {
+                grid-template-columns: 1fr;
+            }
+
+            #filters-form .filter-checkbox-inline {
+                grid-column: 1 / -1;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #game-form {
+                grid-template-columns: 1fr;
+                padding: 1.1rem;
+            }
+
+            .admin-game-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .admin-game-row span {
+                min-width: 0;
+            }
+
+            .admin-toolbar,
+            .admin-game-row,
+            .form-actions {
+                width: 100%;
+            }
+
+            .admin-toolbar .btn,
+            .admin-game-row .btn {
+                flex: 1 1 auto;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 380px) {
+            header .header-text h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.9rem;
             }
         }
     </style>
