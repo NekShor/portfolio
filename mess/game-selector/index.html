@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selector</title>
+    <style>
+        :root {
+            --color-primary: #6d28d9;
+            --color-primary-dark: #5b21b6;
+            --color-primary-light: #ede9fe;
+            --color-accent: #06b6d4;
+            --color-bg: #f4f5fb;
+            --color-surface: #ffffff;
+            --color-border: #e4e4ef;
+            --color-text: #1e1b2e;
+            --color-muted: #6b7280;
+            --color-success: #16a34a;
+            --color-success-bg: #e8f8ee;
+            --color-danger: #dc2626;
+            --color-danger-bg: #fdecec;
+            --color-warning: #d97706;
+            --color-warning-bg: #fff4e3;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow: 0 2px 6px rgba(30, 27, 46, 0.06), 0 10px 24px rgba(30, 27, 46, 0.05);
+            --shadow-hover: 0 6px 16px rgba(30, 27, 46, 0.09), 0 16px 32px rgba(30, 27, 46, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 4rem;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        a {
+            color: var(--color-primary);
+        }
+
+        /* ---------- En-tête ---------- */
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.75rem;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            color: #fff;
+        }
+
+        header .header-text h1 {
+            margin: 0 0 0.25rem;
+            font-size: 1.9rem;
+            letter-spacing: -0.02em;
+        }
+
+        header .header-text p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 42ch;
+        }
+
+        /* ---------- Boutons ---------- */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font: inherit;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        .btn--primary {
+            background: #ffffff;
+            color: var(--color-primary-dark);
+            box-shadow: var(--shadow);
+        }
+
+        .btn--primary:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn--accent {
+            background: var(--color-primary);
+            color: #fff;
+        }
+
+        .btn--accent:hover {
+            background: var(--color-primary-dark);
+        }
+
+        .btn--ghost {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border-color: var(--color-border);
+        }
+
+        .btn--ghost:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .btn--muted {
+            background: var(--color-surface);
+            color: var(--color-muted);
+            border-color: var(--color-border);
+        }
+
+        .btn--muted:hover {
+            border-color: var(--color-muted);
+        }
+
+        .btn--danger {
+            background: var(--color-danger-bg);
+            color: var(--color-danger);
+            border-color: transparent;
+        }
+
+        .btn--danger:hover {
+            background: var(--color-danger);
+            color: #fff;
+        }
+
+        .btn--sm {
+            padding: 0.4rem 0.85rem;
+            font-size: 0.82rem;
+        }
+
+        /* ---------- Filtres ---------- */
+
+        #filters {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.75rem;
+            background: var(--color-surface);
+            box-shadow: var(--shadow);
+        }
+
+        #filters h2 {
+            margin: 0 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        #filters-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        #filters-form label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-muted);
+        }
+
+        #filters-form input,
+        #filters-form select,
+        #game-form input,
+        #game-form select,
+        #game-form textarea {
+            font: inherit;
+            font-weight: 400;
+            color: var(--color-text);
+            padding: 0.55rem 0.7rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            background: var(--color-bg);
+            transition: border-color 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        #filters-form input:focus,
+        #filters-form select:focus,
+        #game-form input:focus,
+        #game-form select:focus,
+        #game-form textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+            background: var(--color-surface);
+        }
+
+        #filters-form .form-actions {
+            grid-column: 1 / -1;
+            align-items: center;
+            margin-top: 0.25rem;
+        }
+
+        #filters-form .filter-checkbox-inline {
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            grid-column: span 2;
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 0.8rem;
+        }
+
+        #filters-form .filter-checkbox-inline input[type="checkbox"] {
+            width: 1.05rem;
+            height: 1.05rem;
+            flex-shrink: 0;
+            accent-color: var(--color-primary);
+        }
+
+        #filters-summary {
+            margin: 1.1rem 0 0;
+            font-weight: 600;
+            color: var(--color-primary-dark);
+        }
+
+        #filters-summary::before {
+            content: "🔎 ";
+        }
+
+        /* ---------- Liste des jeux ---------- */
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.1rem;
+        }
+
+        #games-container:empty::after {
+            content: "😕 Aucun jeu ne correspond à ces critères. Essayez d'élargir vos filtres.";
+            grid-column: 1 / -1;
+            display: block;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            font-style: italic;
+            color: var(--color-muted);
+            background: var(--color-surface);
+            border: 1px dashed var(--color-border);
+            border-radius: var(--radius);
+        }
+
+        .game-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--color-surface);
+            box-shadow: var(--shadow);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .game-card__image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 110px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .game-card__badges {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .game-card__badges--standalone {
+            position: static;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding: 0.6rem 0.6rem 0;
+        }
+
+        .fit-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            background: var(--color-surface);
+            box-shadow: var(--shadow);
+            cursor: help;
+        }
+
+        .fit-badge--good {
+            box-shadow: 0 0 0 2px var(--color-success), var(--shadow);
+        }
+
+        .fit-badge--warning {
+            box-shadow: 0 0 0 2px var(--color-warning), var(--shadow);
+        }
+
+        .game-card__body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 1.1rem;
+        }
+
+        .game-card__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .game-card__header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .game-card p {
+            margin: 0;
+            color: var(--color-muted);
+            font-size: 0.92rem;
+        }
+
+        .game-card__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.2rem;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            background: var(--color-bg);
+            color: var(--color-muted);
+            white-space: nowrap;
+        }
+
+        .tag--positive {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .tag--negative {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .price-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .price-badge--free {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .price-badge--paid {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .game-card__link {
+            margin-top: 0.4rem;
+            align-self: flex-start;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--color-primary);
+        }
+
+        .game-card__link:hover {
+            color: var(--color-primary-dark);
+        }
+
+        /* ---------- Vue d'administration ---------- */
+
+        #view-admin {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        #view-admin h2 {
+            margin-top: 0;
+        }
+
+        .admin-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        #admin-games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .admin-game-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            background: var(--color-bg);
+            transition: opacity 0.12s ease;
+        }
+
+        .admin-game-row span {
+            flex: 1;
+            font-weight: 600;
+            min-width: 140px;
+        }
+
+        .admin-game-row--hidden {
+            opacity: 0.6;
+        }
+
+        .badge-hidden {
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            margin-left: 0.4rem;
+        }
+
+        /* ---------- Formulaire d'ajout / modification ---------- */
+
+        #game-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            max-width: 680px;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            background: var(--color-bg);
+        }
+
+        #game-form h3 {
+            grid-column: 1 / -1;
+            margin: 0;
+        }
+
+        #game-form label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-muted);
+        }
+
+        #game-form label:has(input[type="checkbox"]) {
+            flex-direction: row;
+            align-items: center;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        #game-form input[type="checkbox"] {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--color-primary);
+        }
+
+        #game-form textarea {
+            min-height: 4.5rem;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.6rem;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-text">
+            <h1>🎲 Game Selector</h1>
+            <p>Ce site recense les jeux navigateurs et vous aide à choisir celui qui convient le mieux à votre groupe.</p>
+        </div>
+        <nav>
+            <button id="toggle-admin-btn" class="btn btn--primary" type="button">🛠️ Gérer les jeux</button>
+        </nav>
+    </header>
+
+    <main id="view-games">
+        <section id="filters" aria-label="Filtres de recherche">
+            <h2>🔎 Trouver un jeu</h2>
+            <form id="filters-form">
+                <label>👥 Nombre de joueurs présents
+                    <input type="number" id="filter-player-count" min="1" placeholder="ex : 6">
+                </label>
+                <label>🌐 Jouable sur navigateur
+                    <select id="filter-web">
+                        <option value="any">Peu importe</option>
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </label>
+                <label>🔑 Compte nécessaire
+                    <select id="filter-account">
+                        <option value="any">Peu importe</option>
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </label>
+                <label>⬇️ Téléchargement nécessaire
+                    <select id="filter-download">
+                        <option value="any">Peu importe</option>
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </label>
+                <label class="filter-checkbox-inline">
+                    <input type="checkbox" id="filter-smartphone-only">
+                    📱 Certain·e·s participant·e·s n'ont qu'un smartphone (pas de PC)
+                </label>
+                <label>💶 Prix maximum (€)
+                    <input type="number" id="filter-max-price" min="0" step="0.01" placeholder="ex : 10">
+                </label>
+                <label>📝 Recherche (nom ou description)
+                    <input type="search" id="filter-search" placeholder="ex : déduction">
+                </label>
+                <div class="form-actions">
+                    <button type="button" id="reset-filters-btn" class="btn btn--muted">🔄 Réinitialiser les filtres</button>
+                </div>
+            </form>
+            <p id="filters-summary" aria-live="polite"></p>
+        </section>
+
+        <div id="games-container" class="games-grid"></div>
+    </main>
+
+    <main id="view-admin" hidden>
+        <h2>🛠️ Gestion des jeux</h2>
+        <div class="admin-toolbar">
+            <button id="add-game-btn" class="btn btn--accent" type="button">➕ Ajouter un jeu</button>
+            <button id="reset-games-btn" class="btn btn--danger" type="button">♻️ Réinitialiser les jeux</button>
+        </div>
+        <div id="admin-games-list"></div>
+
+        <form id="game-form" hidden>
+            <h3 id="form-title">Ajouter un jeu</h3>
+            <input type="hidden" id="game-id">
+            <label>Nom
+                <input type="text" id="game-name" required>
+            </label>
+            <label>Description
+                <textarea id="game-description" required></textarea>
+            </label>
+            <label>URL
+                <input type="url" id="game-url" required>
+            </label>
+            <label><input type="checkbox" id="game-web"> Jouable sur navigateur</label>
+            <label><input type="checkbox" id="game-account"> Compte nécessaire</label>
+            <label><input type="checkbox" id="game-download"> Téléchargement nécessaire</label>
+            <label>Prix (€)
+                <input type="number" id="game-price" min="0" step="0.01" value="0">
+            </label>
+            <label>Joueurs min
+                <input type="number" id="game-min" min="1" value="1">
+            </label>
+            <label>Joueurs max
+                <input type="number" id="game-max" min="1" value="1">
+            </label>
+            <label>Joueurs idéal
+                <input type="number" id="game-ideal" min="1" value="1">
+            </label>
+            <label>Compatibilité smartphone
+                <select id="game-smartphone">
+                    <option value="0">Non supporté</option>
+                    <option value="1">Non recommandé</option>
+                    <option value="2">Acceptable</option>
+                </select>
+            </label>
+            <div class="form-actions">
+                <button type="submit" class="btn btn--accent">✅ Enregistrer</button>
+                <button type="button" id="cancel-form-btn" class="btn btn--muted">✖️ Annuler</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const version = "0.0.6"
+
+        const SmartphoneCompatibility = Object.freeze({
+            NOT_SUPPORTED: 0,
+            NOT_RECOMMENDED: 1,
+            ACCEPTABLE: 2
+        });
+
+        var defaultGames = [
+            {
+                name: "Wolfy",
+                image: "https://wolfy.net/static/img/assets/card.png",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 5,
+                    max: 20,
+                    ideal: 10
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://wolfy.net/fr",
+                description: "Le jeu du loup garou tout simplement."
+            },
+            {
+                name: "Among Us",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/945360/capsule_616x353.jpg",
+                web: false,
+                accound_needed: true,
+                price: 0,
+                download: true,
+                player_number : {
+                    min: 4,
+                    max: 10,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/945360/Among_Us/",
+                description: "Un jeu de déduction sociale où vous devez découvrir l'imposteur."
+            },
+            {
+                name: "Skribbl.io",
+                image: "https://skribbl.io/img/thumbnail.png",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 3,
+                    max: 15,
+                    ideal: 8
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://skribbl.io/",
+                description: "Un jeu de dessin en ligne où vous devez deviner ce que les autres joueurs dessinent."
+            },
+            {
+                name: "Codenames",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.0sk429Tm9hciGYYR4iXN1gHaFj%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 16,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://codenames.game/",
+                description: "Un jeu de mots et de déduction où vous devez faire deviner des mots à votre équipe."
+            },
+            {
+                name: "Town of Salem",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.e4z-S_W2TXr1oVo_hAG9_AHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 7,
+                    max: 15,
+                    ideal: 10
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://www.blankmediagames.com/TownOfSalem/",
+                description: "Un jeu de déduction sociale similaire à 'Les Loups-Garous de Thiercelieux', mais en ligne."
+            },
+            {
+                name: "Gartic Phone",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.Lg1th-of5Bvf8criUGphSgHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 12,
+                    ideal: 8
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://garticphone.com/",
+                description: "Un jeu de dessin et de devinettes en ligne où les joueurs alternent entre dessiner et deviner."
+            },
+            {
+                name: "Wavelengthonline",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROPxm030yEqTeFrxU_dWMbgtE2RYJdgdwkQ8qfTkcPUYI1LPoWgt74O5GU&s=10",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 12,
+                    ideal: 8
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://wavelengthonline.io/",
+                description: "Un jeu de déduction et de communication où les joueurs doivent faire deviner des concepts à leur équipe."
+            },
+            {
+                name: "Imposteur",
+                image: "https://kgames.fr/games/wp/imposteur.jpg",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 10,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://imposteur.kgames.fr/",
+                description: "Un jeu de déduction sociale en ligne où les joueurs doivent identifier l'imposteur parmi eux."
+            },
+            {
+                name: "Infiltrés",
+                image: "https://kgames.fr/games/wp/infiltre.png",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 10,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://infiltrés.kgames.fr/",
+                description: "Un jeu de déduction sociale en ligne où les joueurs doivent identifier les infiltrés parmi eux."
+            },
+            {
+                name: "Pili Pili",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.RwwrkDX-gCyvXGSjRMsjPgAAAA%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 10,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://pilipili.kgames.fr/",
+                description: "Un jeu de déduction sociale en ligne où les joueurs doivent identifier les pili pili parmi eux."
+            },
+            {
+                name: "6 qui prend",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.YGGE7-P79EfbbBt91rjqAQHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 10,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://6quiprend.kgames.fr/",
+                description: "Un jeu de cartes stratégique où les joueurs doivent éviter de prendre des cartes avec des têtes de bœuf."
+            },
+            {
+                name: "Perudo",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.MIXO0SfcPBw_g99vGsEmIwHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://perudo.kgames.fr/",
+                description: "Un jeu de dés stratégique où les joueurs doivent deviner le nombre de dés d'une certaine valeur sous les gobelets des autres joueurs."
+            },
+            {
+                name: "Trio",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.cwpAVCVWKJ7-GF7Qx1PuxQHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 5,
+                download: false,
+                player_number : {
+                    min: 3,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://trio.kgames.fr/",
+                description: "Un jeu de cartes où les joueurs doivent former des ensembles de trois cartes correspondant à certaines caractéristiques."
+            },
+            {
+                name: "Bomb Party",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.fw2dgnb7B4fuQCafF5aj6gHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: true,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://bombparty.kgames.fr/",
+                description: "Un jeu de lettres où les joueurs doivent rapidement trouver des mots contenant une séquence de lettres donnée."
+            },
+            {
+                name: "Limite Limite",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.4H9Sr4kEFPFVszavPlkwiQHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://limitelimite.kgames.fr/",
+                description: "Un jeu de cartes où les joueurs doivent poser des cartes en respectant certaines limites."
+            },
+            {
+                name: "P'tit Bac",
+                image: "https://petitbac.fun/assets/logo-petitbac-3d-DmSQ8_yj.png",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://ptitbac.kgames.fr/",
+                description: "Un jeu de lettres où les joueurs doivent trouver des mots correspondant à des catégories données."
+            },
+            {
+                name: "Fake Artist Goes to New York",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.C0XKiZucp5tZi4AiBAx3JQHaHa%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 4,
+                    max: 10,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://fakeartist.kgames.fr/",
+                description: "Un jeu de dessin où un joueur est le 'fake artist' et doit deviner le mot secret tout en se faisant passer pour un vrai artiste."
+            },
+            {
+                name: "Wiki race",
+                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%2Fid%2FOIP.OE9FLdR2fTXg3LQiZqkBcAAAAA%3Fr%3D0%26pid%3DApi&f=1",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://wikirace.kgames.fr/",
+                description: "Un jeu où les joueurs doivent naviguer sur Wikipédia pour atteindre un article cible le plus rapidement possible."
+            },
+            {
+                name: "PEAK",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3527290/31bac6b2eccf09b368f5e95ce510bae2baf3cfcd/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 4.64,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/3527290/PEAK/",
+                description: "Un jeu d'escalade coopératif où la moindre erreur peut être fatale : seul ou en groupe, votre seul espoir est d'atteindre le sommet d'une île mystérieuse."
+            },
+            {
+                name: "R.E.P.O.",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3241660/1ea445e044a2d5b09cfa8291350b63ebed6e5741/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 6.16,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/3241660/REPO/",
+                description: "Un jeu d'horreur coopératif en ligne jusqu'à 6 joueurs : récupérez des objets à physique réaliste dans des environnements terrifiants tout en restant discrets."
+            },
+            {
+                name: "Sea of Thieves",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172620/579c6d544424019a032f4add98e8f923925c1cef/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 13.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/1172620/Sea_of_Thieves_2026_Edition/",
+                description: "Une aventure de pirates en monde ouvert : formez un équipage, pillez des trésors, affrontez d'autres bateaux et des monstres marins."
+            },
+            {
+                name: "Pratfall",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4244510/3f98ce3ab76af1109463b66bbb008665cc1643a1/header_alt_assets_1.jpg",
+                web: false,
+                accound_needed: true,
+                price: 5.61,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/4244510/Pratfall/",
+                description: "Un jeu coopératif où vous tombez, creusez et explosez votre chemin dans un réseau de grottes dangereuses pour retrouver votre chien perdu."
+            },
+            {
+                name: "Party Animals",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1260320/14b53fc1e5d888e5690221350d83eb133b7af683/header_alt_assets_10.jpg",
+                web: false,
+                accound_needed: true,
+                price: 10.79,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/1260320/Party_Animals/",
+                description: "Combattez vos amis dans la peau de chiots, chatons et autres bêtes à poils, en local ou en ligne, dans un monde à la physique chaotique."
+            },
+            {
+                name: "Lethal Company",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1966720/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 9.75,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/1966720/Lethal_Company/",
+                description: "Un jeu d'horreur coopératif où vous récupérez de la ferraille sur des lunes abandonnées pour la revendre à l'Entreprise."
+            },
+            {
+                name: "Phasmophobia",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/739630/c227a2855aba60f3657bc0c3a46515b8c41fb2b6/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 13.29,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/739630/Phasmophobia/",
+                description: "Un jeu d'horreur psychologique coopératif à 4 joueurs : traquez des fantômes avec tout l'équipement de chasse aux spectres à votre disposition."
+            },
+            {
+                name: "Rocket League",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252950/d56cf9d01073d893677fb9e7e257b79fd7939ee3/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 0,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/252950/Rocket_League/",
+                description: "Un mélange survolté de football arcade et de voitures acrobatiques, en matchs occasionnels ou compétitifs jusqu'à 4 contre 4."
+            },
+            {
+                name: "Overcooked! 2",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/728880/9305414f49b2f7aee7f7198dc507d6b66383fdd6/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 5.74,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/728880/Overcooked_2/",
+                description: "Retournez au Royaume de l'Oignon et formez votre équipe de chefs pour cuisiner dans un chaos total, en canapé ou en ligne jusqu'à 4 joueurs."
+            },
+            {
+                name: "Fall Guys",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1097150/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 0,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/1097150/Fall_Guys/",
+                description: "Un party-royale multijoueur gratuit et déjanté : affrontez d'autres joueurs sur des parcours d'obstacles absurdes avec vos amis."
+            },
+            {
+                name: "Human Fall Flat",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/477160/9258286b309480a3ce438c07cb51fadf3ea2f1d1/header_alt_assets_27.jpg",
+                web: false,
+                accound_needed: true,
+                price: 5.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/477160/Human_Fall_Flat/",
+                description: "Un jeu de plateforme physique hilarant et décontracté, jouable seul ou jusqu'à 8 joueurs en ligne dans des paysages de rêve flottants."
+            },
+            {
+                name: "It Takes Two",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 11.99,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 2,
+                    ideal: 2
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+                description: "Une aventure coopérative à deux joueurs uniquement, pleine de mécaniques de jeu toujours renouvelées. Élu Jeu de l'Année 2021."
+            },
+            {
+                name: "Left 4 Dead 2",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 1.95,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/550/Left_4_Dead_2/",
+                description: "Un FPS d'horreur coopératif dans l'apocalypse zombie : traversez villes, marais et cimetières du Sud profond avec vos amis."
+            },
+            {
+                name: "The Jackbox Party Pack 11",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3364070/35c35317cc3f6ac5733896ab00c4cfbd5a1a025d/header.jpg",
+                web: true,
+                accound_needed: false,
+                price: 22.49,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://store.steampowered.com/app/3364070/The_Jackbox_Party_Pack_11/",
+                description: "5 nouveaux jeux d'ambiance : une seule personne possède le jeu, les autres rejoignent et jouent directement depuis le navigateur de leur smartphone."
+            },
+            {
+                name: "Deep Rock Galactic",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/d3edf99a4ae52d305ec6ddd2a8f2703499b8aae5/header_alt_assets_28.jpg",
+                web: false,
+                accound_needed: true,
+                price: 8.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/548430/Deep_Rock_Galactic/",
+                description: "Un FPS coopératif de nains mineurs de l'espace, avec environnements destructibles générés procéduralement et hordes de monstres aliens."
+            },
+            {
+                name: "Valheim",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/892970/1888731b59362fca6c026cdbafa3dfffd45c3146/header_alt_assets_6.jpg",
+                web: false,
+                accound_needed: true,
+                price: 26.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 10,
+                    ideal: 5
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/892970/Valheim/",
+                description: "Un jeu d'exploration et de survie collaboratif pour 1 à 10 joueurs, dans un au-delà généré procéduralement inspiré de la culture viking."
+            },
+            {
+                name: "RV There Yet?",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3949040/cae24b4ed7f4531be51f0d63f785b7d253f92dc3/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 4.67,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/3949040/RV_There_Yet/",
+                description: "Une aventure coopérative où vous devez ramener votre camping-car à la maison, en affrontant les mésaventures de la route avec vos amis."
+            },
+            {
+                name: "Chained Together",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2567870/9989d3793429ffa481cc3228bb66d65565b9ce2b/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 3.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/2567870/Chained_Together/",
+                description: "Remontez des profondeurs de l'Enfer en escaladant divers mondes, seul ou enchaînés à vos amis, dans ce phénomène de plateforme coopératif."
+            },
+            {
+                name: "Far Far West",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3124540/2d55092d45b1784dcc7cb0ba6ad3f919e62eb5d0/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 15.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/3124540/Far_Far_West/",
+                description: "Un jeu de tir coopératif et chaotique à l'ambiance far west : affrontez des monstres, lancez des sorts et récoltez des primes en équipe."
+            },
+            {
+                name: "Minecraft",
+                image: "https://www.minecraft.net/content/dam/minecraftnet/franchise/logos/minecraft-creeper-face.jpg",
+                web: false,
+                accound_needed: true,
+                price: 26.95,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://www.minecraft.net/",
+                description: "Un jeu de construction et de survie en monde ouvert, jouable seul ou en multijoueur, disponible sur PC, consoles et smartphones."
+            }
+        ];
+
+        const STORAGE_KEY = "game-selector-cache";
+
+        const smartphoneLabels = {
+            [SmartphoneCompatibility.NOT_SUPPORTED]: "Non supporté",
+            [SmartphoneCompatibility.NOT_RECOMMENDED]: "Non recommandé",
+            [SmartphoneCompatibility.ACCEPTABLE]: "Acceptable"
+        };
+
+        function generateId() {
+            return (crypto.randomUUID) ? crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        }
+
+        function loadCache() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) {
+                console.error("Impossible de lire le cache des jeux :", e);
+                return null;
+            }
+        }
+
+        function saveCache(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // Ajoute dans la liste mise en cache les jeux par défaut qui n'y sont pas encore (par nom),
+        // et complète discrètement l'image des jeux déjà en cache qui n'en ont pas encore (mise à jour visuelle),
+        // sans toucher au reste de leurs données ni aux jeux ajoutés par l'utilisateur.
+        function mergeGames(cachedGames, defaults) {
+            const defaultsByName = new Map(defaults.map(game => [game.name, game]));
+            const merged = cachedGames.map(game => {
+                if (game.image) return game;
+                const match = defaultsByName.get(game.name);
+                if (!match || !match.image) return game;
+                return { ...game, image: match.image };
+            });
+            const existingNames = new Set(cachedGames.map(game => game.name));
+            defaults.forEach(game => {
+                if (!existingNames.has(game.name)) {
+                    merged.push({ ...game, id: generateId() });
+                }
+            });
+            return merged;
+        }
+
+        // Initialise le cache : le crée s'il est vide, le fusionne avec la liste par défaut
+        // si la version a changé, ou le laisse tel quel sinon.
+        function initGamesCache() {
+            const cache = loadCache();
+
+            if (!cache) {
+                const gamesWithIds = defaultGames.map(game => ({ ...game, id: generateId() }));
+                saveCache({ version, games: gamesWithIds });
+                return gamesWithIds;
+            }
+
+            if (cache.version !== version) {
+                const merged = mergeGames(cache.games, defaultGames);
+                saveCache({ version, games: merged });
+                return merged;
+            }
+
+            return cache.games;
+        }
+
+        let games = initGamesCache();
+
+        function persistGames() {
+            saveCache({ version, games });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str ?? "";
+            return div.innerHTML;
+        }
+
+        function escapeAttr(str) {
+            return String(str ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+        }
+
+        // Applique tous les filtres de recherche (nombre de joueurs présents, support navigateur,
+        // compte nécessaire, téléchargement, smartphone uniquement, prix, texte libre) aux jeux visibles.
+        function getFilteredGames() {
+            const playerCountRaw = document.getElementById("filter-player-count").value;
+            const playerCount = playerCountRaw ? parseInt(playerCountRaw, 10) : null;
+            const web = document.getElementById("filter-web").value;
+            const account = document.getElementById("filter-account").value;
+            const download = document.getElementById("filter-download").value;
+            const smartphoneOnly = document.getElementById("filter-smartphone-only").checked;
+            const maxPriceRaw = document.getElementById("filter-max-price").value;
+            const maxPrice = maxPriceRaw ? parseFloat(maxPriceRaw) : null;
+            const search = document.getElementById("filter-search").value.trim().toLowerCase();
+
+            return games.filter(game => {
+                if (game.hidden) return false;
+                if (playerCount !== null && (playerCount < game.player_number.min || playerCount > game.player_number.max)) return false;
+                if (web === "yes" && !game.web) return false;
+                if (web === "no" && game.web) return false;
+                if (account === "yes" && !game.accound_needed) return false;
+                if (account === "no" && game.accound_needed) return false;
+                if (download === "yes" && !game.download) return false;
+                if (download === "no" && game.download) return false;
+                // Sans PC pour certains participants : on exclut les jeux non supportés sur smartphone
+                // (les jeux "non recommandé" restent affichés, avec un avertissement).
+                if (smartphoneOnly && game.smartphone === SmartphoneCompatibility.NOT_SUPPORTED) return false;
+                if (maxPrice !== null && game.price > maxPrice) return false;
+                if (search && !game.name.toLowerCase().includes(search) && !game.description.toLowerCase().includes(search)) return false;
+                return true;
+            });
+        }
+
+        // Calcule, pour chaque critère actif, un badge dédié avec son icône et sa description au survol :
+        // un badge par limite réellement approchée, plus un badge "bon match" si tout est confortable.
+        function getGameFitBadges(game) {
+            const playerCountRaw = document.getElementById("filter-player-count").value;
+            const playerCount = playerCountRaw ? parseInt(playerCountRaw, 10) : null;
+            const smartphoneOnly = document.getElementById("filter-smartphone-only").checked;
+
+            const badges = [];
+            let hasCriteria = false;
+
+            if (playerCount !== null) {
+                hasCriteria = true;
+                if (playerCount === game.player_number.min) {
+                    badges.push({
+                        type: "warning",
+                        icon: "🔻",
+                        title: `Tout juste assez de joueurs : ${playerCount} est le minimum requis (${game.player_number.min}-${game.player_number.max})`
+                    });
+                } else if (playerCount === game.player_number.max) {
+                    badges.push({
+                        type: "warning",
+                        icon: "🔺",
+                        title: `Groupe au maximum supporté : ${playerCount} est le nombre maximum de joueurs (${game.player_number.min}-${game.player_number.max})`
+                    });
+                }
+            }
+
+            if (smartphoneOnly) {
+                hasCriteria = true;
+                if (game.smartphone === SmartphoneCompatibility.NOT_RECOMMENDED) {
+                    badges.push({
+                        type: "warning",
+                        icon: "📵",
+                        title: "Jouable sur smartphone, mais non recommandé (expérience dégradée)"
+                    });
+                }
+            }
+
+            if (badges.length === 0 && hasCriteria) {
+                badges.push({
+                    type: "good",
+                    icon: "✅",
+                    title: "Correspond très bien à vos critères actuels"
+                });
+            }
+
+            return badges;
+        }
+
+        // Calcule un score d'adéquation (plus petit = meilleur match) pour trier les jeux les plus adaptés en premier :
+        // proximité au nombre idéal de joueurs, pénalité si on est pile à la limite min/max, et si le smartphone
+        // n'est pas recommandé alors que certains participants n'ont qu'un smartphone.
+        function getGameMatchScore(game) {
+            const playerCountRaw = document.getElementById("filter-player-count").value;
+            const playerCount = playerCountRaw ? parseInt(playerCountRaw, 10) : null;
+            const smartphoneOnly = document.getElementById("filter-smartphone-only").checked;
+
+            let score = 0;
+
+            if (playerCount !== null) {
+                score += Math.abs(playerCount - game.player_number.ideal);
+                if (playerCount === game.player_number.min || playerCount === game.player_number.max) {
+                    score += 50;
+                }
+            }
+
+            if (smartphoneOnly && game.smartphone === SmartphoneCompatibility.NOT_RECOMMENDED) {
+                score += 50;
+            }
+
+            return score;
+        }
+
+        function renderGamesView() {
+            const container = document.getElementById("games-container");
+            const summary = document.getElementById("filters-summary");
+            const filteredGames = getFilteredGames()
+                .sort((a, b) => getGameMatchScore(a) - getGameMatchScore(b));
+            container.innerHTML = "";
+            summary.textContent = filteredGames.length > 1
+                ? `${filteredGames.length} jeux correspondent à ces critères.`
+                : `${filteredGames.length} jeu correspond à ces critères.`;
+            filteredGames.forEach(game => {
+                const card = document.createElement("article");
+                card.className = "game-card";
+                const priceLabel = game.price > 0 ? `${escapeHtml(String(game.price))} €` : "Gratuit";
+                const fitBadges = getGameFitBadges(game)
+                    .map(badge => `<span class="fit-badge fit-badge--${badge.type}" title="${escapeAttr(badge.title)}">${badge.icon}</span>`)
+                    .join("");
+                // On n'affiche une zone d'image que si le jeu a une vraie image renseignée ;
+                // si elle échoue à charger, on retire simplement la zone.
+                const imageBlock = game.image
+                    ? `<div class="game-card__image">
+                        <img src="${escapeAttr(game.image)}" alt="${escapeAttr(game.name)}" loading="lazy" onerror="this.closest('.game-card__image').remove()">
+                        ${fitBadges ? `<div class="game-card__badges">${fitBadges}</div>` : ""}
+                    </div>`
+                    : (fitBadges ? `<div class="game-card__badges game-card__badges--standalone">${fitBadges}</div>` : "");
+                card.innerHTML = `
+                    ${imageBlock}
+                    <div class="game-card__body">
+                        <div class="game-card__header">
+                            <h3>${escapeHtml(game.name)}</h3>
+                            <span class="price-badge ${game.price > 0 ? "price-badge--paid" : "price-badge--free"}">${priceLabel}</span>
+                        </div>
+                        <p>${escapeHtml(game.description)}</p>
+                        <div class="game-card__tags">
+                            <span class="tag">👥 ${game.player_number.min}-${game.player_number.max} (idéal ${game.player_number.ideal})</span>
+                            <span class="tag ${game.web ? "tag--positive" : ""}">🌐 ${game.web ? "Navigateur" : "Hors navigateur"}</span>
+                            <span class="tag ${!game.accound_needed ? "tag--positive" : "tag--negative"}">🔑 Compte ${game.accound_needed ? "requis" : "non requis"}</span>
+                            <span class="tag ${!game.download ? "tag--positive" : "tag--negative"}">⬇️ ${game.download ? "Téléchargement requis" : "Sans téléchargement"}</span>
+                            <span class="tag">📱 ${smartphoneLabels[game.smartphone]}</span>
+                        </div>
+                        <a class="game-card__link" href="${escapeAttr(game.url)}" target="_blank" rel="noopener">Voir le jeu →</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById("admin-games-list");
+            container.innerHTML = "";
+            games.forEach(game => {
+                const row = document.createElement("div");
+                row.className = game.hidden ? "admin-game-row admin-game-row--hidden" : "admin-game-row";
+                row.innerHTML = `
+                    <span>${escapeHtml(game.name)}${game.hidden ? '<span class="badge-hidden">Masqué</span>' : ""}</span>
+                    <button type="button" class="btn btn--sm btn--muted" data-action="toggle-hidden" data-id="${escapeAttr(game.id)}">${game.hidden ? "👁️ Afficher" : "🙈 Cacher"}</button>
+                    <button type="button" class="btn btn--sm btn--ghost" data-action="edit" data-id="${escapeAttr(game.id)}">✏️ Modifier</button>
+                    <button type="button" class="btn btn--sm btn--danger" data-action="delete" data-id="${escapeAttr(game.id)}">🗑️ Supprimer</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        const viewGames = document.getElementById("view-games");
+        const viewAdmin = document.getElementById("view-admin");
+        const toggleAdminBtn = document.getElementById("toggle-admin-btn");
+        const addGameBtn = document.getElementById("add-game-btn");
+        const resetGamesBtn = document.getElementById("reset-games-btn");
+        const cancelFormBtn = document.getElementById("cancel-form-btn");
+        const gameForm = document.getElementById("game-form");
+        const formTitle = document.getElementById("form-title");
+
+        // Simule une "nouvelle page" en basculant simplement la visibilité des sections.
+        toggleAdminBtn.addEventListener("click", () => {
+            const showAdmin = viewAdmin.hidden;
+            viewAdmin.hidden = !showAdmin;
+            viewGames.hidden = showAdmin;
+            toggleAdminBtn.textContent = showAdmin ? "⬅️ Retour à la liste" : "🛠️ Gérer les jeux";
+            if (showAdmin) {
+                renderAdminList();
+            } else {
+                closeForm();
+            }
+        });
+
+        function openForm(game) {
+            formTitle.textContent = game ? "Modifier le jeu" : "Ajouter un jeu";
+            document.getElementById("game-id").value = game ? game.id : "";
+            document.getElementById("game-name").value = game ? game.name : "";
+            document.getElementById("game-description").value = game ? game.description : "";
+            document.getElementById("game-url").value = game ? game.url : "";
+            document.getElementById("game-web").checked = game ? game.web : false;
+            document.getElementById("game-account").checked = game ? game.accound_needed : false;
+            document.getElementById("game-download").checked = game ? game.download : false;
+            document.getElementById("game-price").value = game ? game.price : 0;
+            document.getElementById("game-min").value = game ? game.player_number.min : 1;
+            document.getElementById("game-max").value = game ? game.player_number.max : 1;
+            document.getElementById("game-ideal").value = game ? game.player_number.ideal : 1;
+            document.getElementById("game-smartphone").value = game ? game.smartphone : SmartphoneCompatibility.ACCEPTABLE;
+            gameForm.hidden = false;
+        }
+
+        function closeForm() {
+            gameForm.hidden = true;
+            gameForm.reset();
+        }
+
+        addGameBtn.addEventListener("click", () => openForm(null));
+        cancelFormBtn.addEventListener("click", closeForm);
+
+        // Réinitialise la liste des jeux (et le cache) aux valeurs par défaut d'origine.
+        resetGamesBtn.addEventListener("click", () => {
+            if (confirm("Réinitialiser la liste des jeux aux valeurs par défaut ? Toutes les modifications, ajouts et suppressions seront perdus.")) {
+                games = defaultGames.map(game => ({ ...game, id: generateId() }));
+                persistGames();
+                renderGamesView();
+                renderAdminList();
+                closeForm();
+            }
+        });
+
+        gameForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const id = document.getElementById("game-id").value;
+            const gameData = {
+                id: id || generateId(),
+                name: document.getElementById("game-name").value.trim(),
+                web: document.getElementById("game-web").checked,
+                accound_needed: document.getElementById("game-account").checked,
+                price: parseFloat(document.getElementById("game-price").value) || 0,
+                download: document.getElementById("game-download").checked,
+                player_number: {
+                    min: parseInt(document.getElementById("game-min").value, 10) || 1,
+                    max: parseInt(document.getElementById("game-max").value, 10) || 1,
+                    ideal: parseInt(document.getElementById("game-ideal").value, 10) || 1
+                },
+                smartphone: parseInt(document.getElementById("game-smartphone").value, 10),
+                url: document.getElementById("game-url").value.trim(),
+                description: document.getElementById("game-description").value.trim()
+            };
+
+            if (id) {
+                const index = games.findIndex(game => game.id === id);
+                if (index !== -1) {
+                    gameData.hidden = games[index].hidden ?? false;
+                    // Conserve l'image existante du jeu (non modifiable depuis ce formulaire).
+                    gameData.image = games[index].image;
+                    games[index] = gameData;
+                }
+            } else {
+                gameData.hidden = false;
+                games.push(gameData);
+            }
+
+            persistGames();
+            renderGamesView();
+            renderAdminList();
+            closeForm();
+        });
+
+        document.getElementById("admin-games-list").addEventListener("click", (event) => {
+            const button = event.target.closest("button[data-action]");
+            if (!button) return;
+
+            const id = button.dataset.id;
+            const game = games.find(game => game.id === id);
+            if (!game) return;
+
+            if (button.dataset.action === "edit") {
+                openForm(game);
+            } else if (button.dataset.action === "toggle-hidden") {
+                game.hidden = !game.hidden;
+                persistGames();
+                renderGamesView();
+                renderAdminList();
+            } else if (button.dataset.action === "delete") {
+                if (confirm(`Supprimer "${game.name}" ?`)) {
+                    games = games.filter(game => game.id !== id);
+                    persistGames();
+                    renderGamesView();
+                    renderAdminList();
+                }
+            }
+        });
+
+        const filtersForm = document.getElementById("filters-form");
+        const resetFiltersBtn = document.getElementById("reset-filters-btn");
+
+        // Tout changement dans un filtre recalcule immédiatement la liste des jeux possibles.
+        filtersForm.addEventListener("input", renderGamesView);
+        filtersForm.addEventListener("change", renderGamesView);
+        filtersForm.addEventListener("submit", (event) => event.preventDefault());
+
+        resetFiltersBtn.addEventListener("click", () => {
+            filtersForm.reset();
+            renderGamesView();
+        });
+
+        renderGamesView();
+    </script>
+</body>
+</html>
