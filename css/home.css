@@ -137,116 +137,42 @@ body{
 }
 
 #loader{
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: #1B2738;
-    transform: translateY(0);
-    transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-#loader.loader-leave{
-    transform: translateY(-105%);
+    transition-duration: 3s;
 }
 
 #loader #contentLoader{
-    position: relative;
-    overflow: hidden;
-    background: #1B2738!important;
+    background: linear-gradient(to top, #CFE0FF, #8BD59E);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-#loader #contentLoader::before,
-#loader #contentLoader::after{
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-#loader #contentLoader::before{
-    width: 150vmax;
-    aspect-ratio: 1;
-    background: linear-gradient(135deg, #CFE0FF, #8BD59E);
-    transform: translate(-50%, -50%) scale(0);
-}
-
-#loader #contentLoader::after{
-    width: min(72vw, 72vh);
-    aspect-ratio: 1;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 0 0 22px rgba(255, 255, 255, 0.08);
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.7);
-}
-
-#loader.loader-ready #contentLoader::before{
-    animation: loader-bloom 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-#loader.loader-ready #contentLoader::after{
-    animation: loader-ring 0.85s 0.08s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes loader-bloom{
-    to { transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes loader-ring{
-    65% { opacity: 1; }
-    to { opacity: 0.75; transform: translate(-50%, -50%) scale(1.08); }
-}
-
 #loader #contentLoader .h1{
-    position: relative;
     color: white;
-    font-size: clamp(4rem, 14vw, 13rem);
+    font-size: 15em;
     font-family: 'Poppins', sans-serif;
     text-align: center;
     font-weight: bold;
     opacity: 0;
-    z-index: 1;
-    text-shadow: 0 3px 28px rgba(27, 39, 56, 0.2);
-}
-
-#loader.loader-ready #contentLoader .h1{
-    animation: loader-title-in 0.55s 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes loader-title-in{
-    from { opacity: 0; transform: translateY(24px) scale(0.94); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    transition-duration: 1s;
+    transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1000;
 }
 
 @media only screen and (max-width: 768px) {
     #loader #contentLoader .h1{
-        font-size: clamp(3.5rem, 18vw, 6rem);
+        color: white;
+        font-size: 5em;
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        font-weight: bold;
+        opacity: 0;
+        transition-duration: 1s;
+        transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
 
     #loader #contentLoader .h1 span{
         display: none;
-    }
-
-    #loader #contentLoader::after{
-        width: 72vw;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #loader,
-    #loader.loader-leave{
-        transition: none;
-    }
-
-    #loader.loader-ready #contentLoader::before,
-    #loader.loader-ready #contentLoader::after,
-    #loader.loader-ready #contentLoader .h1{
-        animation-duration: 0.01ms;
     }
 }
 
