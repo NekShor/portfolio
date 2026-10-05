@@ -725,7 +725,7 @@
     </main>
 
     <script>
-        const version = "0.0.6"
+        const version = "0.0.8"
 
         const SmartphoneCompatibility = Object.freeze({
             NOT_SUPPORTED: 0,
@@ -822,11 +822,11 @@
                 price: 0,
                 download: false,
                 player_number : {
-                    min: 4,
+                    min: 3,
                     max: 12,
                     ideal: 8
                 },
-                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
                 url: "https://garticphone.com/",
                 description: "Un jeu de dessin et de devinettes en ligne où les joueurs alternent entre dessiner et deviner."
             },
@@ -854,7 +854,7 @@
                 price: 0,
                 download: false,
                 player_number : {
-                    min: 4,
+                    min: 3,
                     max: 10,
                     ideal: 6
                 },
@@ -871,8 +871,8 @@
                 download: false,
                 player_number : {
                     min: 4,
-                    max: 10,
-                    ideal: 6
+                    max: 6,
+                    ideal: 5
                 },
                 smartphone: SmartphoneCompatibility.ACCEPTABLE,
                 url: "https://infiltrés.kgames.fr/",
@@ -886,7 +886,7 @@
                 price: 0,
                 download: false,
                 player_number : {
-                    min: 4,
+                    min: 3,
                     max: 10,
                     ideal: 6
                 },
@@ -1341,6 +1341,246 @@
                 smartphone: SmartphoneCompatibility.ACCEPTABLE,
                 url: "https://www.minecraft.net/",
                 description: "Un jeu de construction et de survie en monde ouvert, jouable seul ou en multijoueur, disponible sur PC, consoles et smartphones."
+            },
+            {
+                name: "Terraria",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 4.87,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/105600/Terraria/",
+                description: "Creusez, combattez, explorez, construisez ! Une aventure 2D en monde ouvert jouable seul ou en multijoueur."
+            },
+            {
+                name: "Stardew Valley",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/413150/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 9.79,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/413150/Stardew_Valley/",
+                description: "Reprenez la ferme de votre grand-père et transformez des champs à l'abandon en exploitation florissante, seul ou avec des amis."
+            },
+            {
+                name: "GTFO",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/493520/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 10.79,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/493520/GTFO/",
+                description: "Un FPS d'horreur coopératif et exigeant : discrétion, stratégie et travail d'équipe sont indispensables pour survivre dans une prison souterraine mortelle."
+            },
+            {
+                name: "PAYDAY 2",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/218620/c44949287e8ffa2518f01b5033b8431dd0f984e4/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 4.74,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/218620/PAYDAY_2/",
+                description: "Un braquage coopératif à 4 joueurs : enfilez le masque de l'équipe Payday pour une série de casses spectaculaires."
+            },
+            {
+                name: "HELLDIVERS 2",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/553850/850e2f9e5bb15c5706bb9a1edc832f4f782e8be5/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 29.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/553850/HELLDIVERS_2/",
+                description: "Engagez-vous dans les Helldivers et combattez pour la liberté à travers une galaxie hostile dans ce TPS coopératif intense."
+            },
+            {
+                name: "Content Warning",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2881650/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 4.64,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/2881650/Content_Warning/",
+                description: "Filmez vos amis en train de faire des choses effrayantes pour devenir célèbres sur SpöökTube ! (déconseillé d'y aller seul)"
+            },
+            {
+                name: "Unrailed!",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1016920/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 2.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/1016920/Unrailed/",
+                description: "Construisez une voie ferrée à travers des mondes générés procéduralement sans fin, en coopération avec vos amis."
+            },
+            {
+                name: "Moving Out",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/996770/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 2.29,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/996770/Moving_Out/",
+                description: "Un simulateur de déménagement déjanté à la physique chaotique, en canapé ou en ligne, pour une carrière dans le mobilier."
+            },
+            {
+                name: "Keep Talking and Nobody Explodes",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/341800/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 7.39,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/",
+                description: "Un joueur est piégé seul face à une bombe à retardement, les autres ont le manuel de désamorçage mais ne voient pas la bombe : il faut parler vite !"
+            },
+            {
+                name: "Risk of Rain 2",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/632360/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 8.24,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/632360/Risk_of_Rain_2/",
+                description: "Échappez à une planète extraterrestre chaotique en combattant des hordes de monstres déchaînés, seul ou avec des amis."
+            },
+            {
+                name: "Don't Starve Together",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/322330/51e5f44e4e38ce02a985687df4fdc8feb678219b/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 5.09,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 6,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/322330/Dont_Starve_Together/",
+                description: "L'extension multijoueur du jeu de survie en nature sauvage impitoyable Don't Starve : combattez, cultivez, construisez et explorez ensemble."
+            },
+            {
+                name: "Raft",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/648800/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 13.72,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/648800/Raft/",
+                description: "Une aventure océanique épique : seul ou à plusieurs, luttez pour survivre à une périlleuse traversée et construisez votre radeau flottant."
+            },
+            {
+                name: "Golf With Your Friends",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/431240/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 2.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 12,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
+                url: "https://store.steampowered.com/app/431240/Golf_With_Your_Friends/",
+                description: "Pourquoi avoir des amis si ce n'est pour jouer au mini-golf avec eux ! Des parcours déjantés et simultanés jusqu'à 12 joueurs."
+            },
+            {
+                name: "Grounded",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/962130/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 19.99,
+                download: true,
+                player_number : {
+                    min: 1,
+                    max: 4,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/962130/Grounded/",
+                description: "Le monde devient vaste et dangereux quand on est réduit à la taille d'une fourmi : survivez aux hordes d'insectes géants du jardin, en équipe."
+            },
+            {
+                name: "Kculture",
+                image: "https://kgames.fr/games/icons/kculture.jpg",
+                web: true,
+                accound_needed: false,
+                price: 0,
+                download: false,
+                player_number : {
+                    min: 2,
+                    max: 12,
+                    ideal: 6
+                },
+                smartphone: SmartphoneCompatibility.ACCEPTABLE,
+                url: "https://kculture.kgames.fr/",
+                description: "Testez votre culture générale entre amis ou en famille grâce à un quizz de 40 questions : rébus, têtes mélangées, Petit Bac et bien d'autres épreuves."
             }
         ];
 
