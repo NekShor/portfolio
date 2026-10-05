@@ -163,6 +163,12 @@
             font-size: 0.82rem;
         }
 
+        .btn.is-loading {
+            opacity: 0.8;
+            pointer-events: none;
+            transform: scale(0.99);
+        }
+
         /* ---------- Filtres ---------- */
 
         #filters {
@@ -545,6 +551,101 @@
 
         /* ---------- Responsive ---------- */
 
+        .oracle-result {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 0.9rem;
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            border-radius: var(--radius);
+            border: 1px solid rgba(109, 40, 217, 0.18);
+            background: linear-gradient(135deg, rgba(109, 40, 217, 0.08), rgba(6, 182, 212, 0.07));
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .oracle-result::before {
+            content: "";
+            position: absolute;
+            inset: -40% auto auto -25%;
+            width: 55%;
+            height: 180%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            transform: rotate(18deg);
+            animation: oracle-sweep 1.8s ease-in-out infinite;
+        }
+
+        .oracle-visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.2rem;
+            height: 3.2rem;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #fff 0%, #dfe7ff 18%, #8b5cf6 35%, #1d4ed8 100%);
+            box-shadow: 0 0 0 0 rgba(109, 40, 217, 0.35);
+            animation: oracle-pulse 1.5s ease-in-out infinite;
+        }
+
+        .oracle-orb {
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e0f2fe 20%, #7dd3fc 60%, #3730a3 100%);
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 16px rgba(125, 211, 252, 0.8);
+        }
+
+        .oracle-copy {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            color: var(--color-text);
+            font-weight: 600;
+        }
+
+        .oracle-copy strong {
+            font-size: 1.05rem;
+            color: var(--color-primary-dark);
+        }
+
+        .oracle-copy span {
+            color: var(--color-muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .oracle-result.is-visible {
+            animation: oracle-reveal 0.45s ease-out both;
+        }
+
+        .oracle-result.is-thinking .oracle-copy {
+            font-style: italic;
+        }
+
+        @keyframes oracle-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0.35); }
+            70% { box-shadow: 0 0 0 12px rgba(109, 40, 217, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0); }
+        }
+
+        @keyframes oracle-sweep {
+            0% { transform: translateX(-160%) rotate(18deg); opacity: 0; }
+            20% { opacity: 1; }
+            75% { opacity: 1; }
+            100% { transform: translateX(220%) rotate(18deg); opacity: 0; }
+        }
+
+        @keyframes oracle-reveal {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: 1rem 0.85rem 3rem;
@@ -571,6 +672,16 @@
 
             #filters-form .filter-checkbox-inline {
                 grid-column: 1 / -1;
+            }
+
+            .oracle-result {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+
+            .oracle-copy {
+                align-items: center;
             }
 
             .games-grid {
@@ -670,6 +781,15 @@
                 </div>
             </form>
             <p id="filters-summary" aria-live="polite"></p>
+            <div class="form-actions" style="margin-top: 1rem;">
+                <button type="button" id="oracle-random-btn" class="btn btn--accent">🔮 Demander à l'oracle</button>
+            </div>
+            <div id="oracle-result" class="oracle-result" aria-live="polite" hidden>
+                <div class="oracle-visual" aria-hidden="true">
+                    <span class="oracle-orb"></span>
+                </div>
+                <div class="oracle-copy"></div>
+            </div>
         </section>
 
         <div id="games-container" class="games-grid"></div>
@@ -1101,6 +1221,22 @@
                 smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
                 url: "https://store.steampowered.com/app/1260320/Party_Animals/",
                 description: "Combattez vos amis dans la peau de chiots, chatons et autres bêtes à poils, en local ou en ligne, dans un monde à la physique chaotique."
+            },
+            {
+                name: "Pummel Party",
+                image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1074160/header.jpg",
+                web: false,
+                accound_needed: true,
+                price: 14.99,
+                download: true,
+                player_number : {
+                    min: 2,
+                    max: 8,
+                    ideal: 4
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://store.steampowered.com/app/1074160/Pummel_Party/",
+                description: "Un party game multijoueur où il faut refuser les mini-jeux, saboter vos amis et survivre aux pièges jusqu'au bout."
             },
             {
                 name: "Lethal Company",
@@ -1791,12 +1927,53 @@
             return score;
         }
 
+        function getWeightedOracleGames() {
+            const filteredGames = getFilteredGames();
+            if (filteredGames.length === 0) {
+                return [];
+            }
+
+            const playerCountRaw = document.getElementById("filter-player-count").value;
+            const playerCount = playerCountRaw ? parseInt(playerCountRaw, 10) : null;
+
+            return filteredGames.map(game => {
+                let weight = 1;
+
+                if (playerCount !== null && playerCount === game.player_number.ideal) {
+                    weight = 2;
+                }
+
+                return { game, weight };
+            });
+        }
+
+        function pickOracleGame() {
+            const weightedGames = getWeightedOracleGames();
+            if (weightedGames.length === 0) {
+                return null;
+            }
+
+            const totalWeight = weightedGames.reduce((sum, entry) => sum + entry.weight, 0);
+            let random = Math.random() * totalWeight;
+
+            for (const entry of weightedGames) {
+                random -= entry.weight;
+                if (random <= 0) {
+                    return entry.game;
+                }
+            }
+
+            return weightedGames[weightedGames.length - 1].game;
+        }
+
         function renderGamesView() {
             const container = document.getElementById("games-container");
             const summary = document.getElementById("filters-summary");
+            const oracleResult = document.getElementById("oracle-result");
             const filteredGames = getFilteredGames()
                 .sort((a, b) => getGameMatchScore(a) - getGameMatchScore(b));
             container.innerHTML = "";
+            oracleResult.textContent = "";
             summary.textContent = filteredGames.length > 1
                 ? `${filteredGames.length} jeux correspondent à ces critères.`
                 : `${filteredGames.length} jeu correspond à ces critères.`;
@@ -1987,6 +2164,43 @@
         resetFiltersBtn.addEventListener("click", () => {
             filtersForm.reset();
             renderGamesView();
+        });
+
+        document.getElementById("oracle-random-btn").addEventListener("click", () => {
+            const selectedGame = pickOracleGame();
+            const oracleButton = document.getElementById("oracle-random-btn");
+            const oracleResult = document.getElementById("oracle-result");
+            const oracleCopy = oracleResult.querySelector(".oracle-copy");
+
+            oracleButton.disabled = true;
+            oracleButton.classList.add("is-loading");
+            oracleButton.textContent = "🔮 L'oracle réfléchit...";
+            oracleResult.hidden = false;
+            oracleResult.classList.remove("is-visible");
+            oracleResult.classList.add("is-thinking");
+            oracleCopy.innerHTML = "<strong>L'oracle consulte les étoiles...</strong><span>Le choix se précise...</span>";
+
+            setTimeout(() => {
+                if (!selectedGame) {
+                    oracleCopy.innerHTML = "<strong>Pas de jeu trouvé</strong><span>L'oracle n'a trouvé aucun jeu compatible avec ces filtres.</span>";
+                    oracleResult.classList.remove("is-thinking");
+                    oracleResult.classList.add("is-visible");
+                    oracleButton.disabled = false;
+                    oracleButton.classList.remove("is-loading");
+                    oracleButton.textContent = "🔮 Demander à l'oracle";
+                    return;
+                }
+
+                oracleCopy.innerHTML = `
+                    <strong>${escapeHtml(selectedGame.name)}</strong>
+                    <span>${escapeHtml(selectedGame.description)}</span>
+                `;
+                oracleResult.classList.remove("is-thinking");
+                oracleResult.classList.add("is-visible");
+                oracleButton.disabled = false;
+                oracleButton.classList.remove("is-loading");
+                oracleButton.textContent = "🔮 Demander à l'oracle";
+            }, 850);
         });
 
         renderGamesView();
