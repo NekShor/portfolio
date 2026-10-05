@@ -725,7 +725,7 @@
     </main>
 
     <script>
-        const version = "0.0.8"
+        const version = "0.0.9"
 
         const SmartphoneCompatibility = Object.freeze({
             NOT_SUPPORTED: 0,
@@ -855,7 +855,7 @@
                 download: false,
                 player_number : {
                     min: 3,
-                    max: 10,
+                    max: 6,
                     ideal: 6
                 },
                 smartphone: SmartphoneCompatibility.ACCEPTABLE,
@@ -1581,6 +1581,22 @@
                 smartphone: SmartphoneCompatibility.ACCEPTABLE,
                 url: "https://kculture.kgames.fr/",
                 description: "Testez votre culture générale entre amis ou en famille grâce à un quizz de 40 questions : rébus, têtes mélangées, Petit Bac et bien d'autres épreuves."
+            },
+            {
+                name: "Just One",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Just_One_party_game_box%2C_rules%2C_cards%2C_and_pieces_01.jpg/500px-Just_One_party_game_box%2C_rules%2C_cards%2C_and_pieces_01.jpg",
+                web: false,
+                accound_needed: false,
+                price: 24.90,
+                download: false,
+                player_number : {
+                    min: 3,
+                    max: 7,
+                    ideal: 5
+                },
+                smartphone: SmartphoneCompatibility.NOT_SUPPORTED,
+                url: "https://en.wikipedia.org/wiki/Just_One_(board_game)",
+                description: "Un jeu de société coopératif où chaque joueur écrit un indice en un seul mot pour aider le devineur à trouver le mot secret, sans dupliquer les indices des autres."
             }
         ];
 
