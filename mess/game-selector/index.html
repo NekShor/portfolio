@@ -790,8 +790,8 @@
 
         #oracle-overlay .oracle-big-orb {
             position: relative;
-            width: min(94vw, 94vh);
-            height: min(94vw, 94vh);
+            width: min(72vw, 72vh, 560px);
+            height: min(72vw, 72vh, 560px);
             border-radius: 50%;
             overflow: hidden;
             isolation: isolate;
@@ -803,22 +803,92 @@
         }
 
         #oracle-overlay.is-open .oracle-big-orb {
-            animation: oracle-big-grow 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: oracle-big-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         #oracle-overlay .oracle-big-image {
             position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            z-index: 1;
+            left: 50%;
+            top: 46%;
+            width: 52%;
+            height: 52%;
+            margin: -26% 0 0 -26%;
             object-fit: cover;
+            border-radius: 50%;
             opacity: 0;
-            filter: blur(32px) saturate(1.4);
-            transform: scale(1.25);
+            filter: blur(24px) saturate(1.4);
+            transform: scale(0.6);
+            -webkit-mask-image: radial-gradient(circle, #000 52%, transparent 74%);
+            mask-image: radial-gradient(circle, #000 52%, transparent 74%);
         }
 
         #oracle-overlay .oracle-big-image.is-loaded {
-            animation: oracle-big-focus 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: oracle-big-focus 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        #oracle-overlay .oracle-mist {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 2.4s ease;
+        }
+
+        #oracle-overlay .oracle-mist::before {
+            content: "";
+            position: absolute;
+            inset: -10%;
+            background:
+                radial-gradient(ellipse 40% 28% at 25% 30%, rgba(255,255,255,0.45), transparent 70%),
+                radial-gradient(ellipse 45% 30% at 75% 65%, rgba(200,190,255,0.45), transparent 70%),
+                radial-gradient(ellipse 35% 25% at 50% 85%, rgba(255,255,255,0.35), transparent 70%);
+            filter: blur(14px);
+            animation: oracle-mist-swirl 14s linear infinite;
+        }
+
+        #oracle-overlay .oracle-figure {
+            position: absolute;
+            width: 20%;
+            height: 38%;
+            left: var(--x);
+            top: var(--y);
+            opacity: 0;
+            filter: blur(9px);
+            animation: oracle-figure-drift var(--d) ease-in-out var(--delay) infinite;
+        }
+
+        #oracle-overlay .oracle-figure::before,
+        #oracle-overlay .oracle-figure::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(226,220,255,0.55) 65%, transparent 80%);
+            transform: translateX(-50%);
+        }
+
+        #oracle-overlay .oracle-figure::before {
+            top: 0;
+            width: 38%;
+            height: 28%;
+            border-radius: 50%;
+        }
+
+        #oracle-overlay .oracle-figure::after {
+            top: 32%;
+            width: 90%;
+            height: 68%;
+            border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+        }
+
+        #oracle-overlay .oracle-figure:nth-child(1) { --x: 8%;  --y: 22%; --d: 9s;  --delay: 0s; }
+        #oracle-overlay .oracle-figure:nth-child(2) { --x: 70%; --y: 18%; --d: 11s; --delay: -3s; }
+        #oracle-overlay .oracle-figure:nth-child(3) { --x: 38%; --y: 56%; --d: 10s; --delay: -6s; }
+        #oracle-overlay .oracle-figure:nth-child(4) { --x: 14%; --y: 52%; --d: 12s; --delay: -2s; }
+        #oracle-overlay .oracle-figure:nth-child(5) { --x: 66%; --y: 50%; --d: 8s;  --delay: -5s; }
+
+        #oracle-overlay:not(.is-thinking) .oracle-mist {
+            opacity: 0.4;
         }
 
         #oracle-overlay .oracle-big-orb::after {
@@ -845,7 +915,7 @@
         }
 
         #oracle-overlay .oracle-big-copy.is-shown {
-            animation: oracle-copy 0.4s 0.25s ease-out both;
+            animation: oracle-copy 0.6s 0.7s ease-out both;
         }
 
         #oracle-overlay .oracle-big-copy strong {
@@ -865,14 +935,28 @@
         }
 
         @keyframes oracle-big-focus {
-            from { opacity: 0; filter: blur(32px) saturate(1.4); transform: scale(1.25); }
-            30% { opacity: 1; }
+            from { opacity: 0; filter: blur(24px) saturate(1.4); transform: scale(0.6); }
+            40% { opacity: 0.7; filter: blur(10px) saturate(1.3); }
             to { opacity: 1; filter: blur(0) saturate(1.1); transform: scale(1); }
+        }
+
+        @keyframes oracle-mist-swirl {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes oracle-figure-drift {
+            0% { opacity: 0; translate: -12% 10%; scale: 0.85; }
+            30% { opacity: 0.75; }
+            60% { opacity: 0.55; translate: 8% -6%; scale: 1; }
+            100% { opacity: 0; translate: 18% -14%; scale: 1.1; }
         }
 
         @media (prefers-reduced-motion: reduce) {
             #oracle-overlay .oracle-big-orb,
             #oracle-overlay .oracle-big-image,
+            #oracle-overlay .oracle-mist,
+            #oracle-overlay .oracle-mist::before,
+            #oracle-overlay .oracle-figure,
             #oracle-overlay .oracle-big-copy {
                 animation: none !important;
                 transform: none;
@@ -1047,6 +1131,7 @@
 
     <div id="oracle-overlay" hidden role="dialog" aria-label="Résultat de l'oracle">
         <div class="oracle-big-orb">
+            <div class="oracle-mist"><i class="oracle-figure"></i><i class="oracle-figure"></i><i class="oracle-figure"></i><i class="oracle-figure"></i><i class="oracle-figure"></i></div>
             <img class="oracle-big-image" alt="">
             <div class="oracle-big-copy"></div>
         </div>
@@ -1174,22 +1259,6 @@
                 smartphone: SmartphoneCompatibility.ACCEPTABLE,
                 url: "https://codenames.game/",
                 description: "Un jeu de mots et de déduction où vous devez faire deviner des mots à votre équipe."
-            },
-            {
-                name: "Town of Salem",
-                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.e4z-S_W2TXr1oVo_hAG9_AHaHa%3Fr%3D0%26pid%3DApi&f=1",
-                web: true,
-                accound_needed: true,
-                price: 0,
-                download: false,
-                player_number : {
-                    min: 7,
-                    max: 15,
-                    ideal: 10
-                },
-                smartphone: SmartphoneCompatibility.NOT_RECOMMENDED,
-                url: "https://www.blankmediagames.com/TownOfSalem/",
-                description: "Un jeu de déduction sociale similaire à 'Les Loups-Garous de Thiercelieux', mais en ligne."
             },
             {
                 name: "Gartic Phone",
@@ -2462,19 +2531,19 @@
             void oracleOverlay.offsetWidth;
             oracleOverlay.classList.add("is-open", "is-thinking");
 
+            if (selectedGame && selectedGame.image) {
+                oracleBigImage.alt = `Illustration de ${selectedGame.name}`;
+                oracleBigImage.onload = () => oracleBigImage.classList.add("is-loaded");
+                oracleBigImage.src = selectedGame.image;
+            }
+
             setTimeout(() => {
                 oracleOverlay.classList.remove("is-thinking");
                 oracleBigCopy.innerHTML = selectedGame
                     ? `<strong>${escapeHtml(selectedGame.name)}</strong><span>${escapeHtml(selectedGame.description)}</span>`
                     : "<strong>Pas de jeu trouvé</strong><span>L'oracle n'a trouvé aucun jeu compatible avec ces filtres.</span>";
                 oracleBigCopy.classList.add("is-shown");
-
-                if (selectedGame && selectedGame.image) {
-                    oracleBigImage.alt = `Illustration de ${selectedGame.name}`;
-                    oracleBigImage.onload = () => oracleBigImage.classList.add("is-loaded");
-                    oracleBigImage.src = selectedGame.image;
-                }
-            }, 550);
+            }, 1400);
         });
         renderGamesView();
     </script>
