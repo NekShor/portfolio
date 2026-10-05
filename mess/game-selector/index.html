@@ -929,6 +929,23 @@
             line-height: 1.4;
         }
 
+        #oracle-restart-btn {
+            position: absolute;
+            left: 50%;
+            bottom: 6%;
+            z-index: 3;
+            transform: translate(-50%, 10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #oracle-overlay.is-open:not(.is-thinking) #oracle-restart-btn {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, 0);
+        }
+
         @keyframes oracle-big-grow {
             from { transform: scale(0.08); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
@@ -1135,6 +1152,7 @@
             <img class="oracle-big-image" alt="">
             <div class="oracle-big-copy"></div>
         </div>
+        <button type="button" id="oracle-restart-btn" class="btn btn--accent">🔄 Redemander à l'oracle</button>
     </div>
 
     <main id="view-admin" hidden>
@@ -2504,20 +2522,22 @@
         const oracleOverlay = document.getElementById("oracle-overlay");
         const oracleBigImage = oracleOverlay.querySelector(".oracle-big-image");
         const oracleBigCopy = oracleOverlay.querySelector(".oracle-big-copy");
+        const oracleRestartBtn = document.getElementById("oracle-restart-btn");
 
         function closeOracleOverlay() {
             oracleOverlay.hidden = true;
             oracleOverlay.classList.remove("is-open", "is-thinking");
         }
 
-        oracleOverlay.addEventListener("click", () => {
+        oracleOverlay.addEventListener("click", (event) => {
+            if (event.target === oracleRestartBtn) return;
             if (!oracleOverlay.classList.contains("is-thinking")) closeOracleOverlay();
         });
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape" && !oracleOverlay.hidden) closeOracleOverlay();
         });
 
-        document.getElementById("oracle-random-btn").addEventListener("click", () => {
+        function askOracle() {
             const selectedGame = pickOracleGame();
 
             oracleBigImage.onload = null;
@@ -2544,6 +2564,13 @@
                     : "<strong>Pas de jeu trouvé</strong><span>L'oracle n'a trouvé aucun jeu compatible avec ces filtres.</span>";
                 oracleBigCopy.classList.add("is-shown");
             }, 1400);
+        }
+
+        document.getElementById("oracle-random-btn").addEventListener("click", askOracle);
+        // Le bouton de relance redemande à l'oracle sans fermer la boule.
+        oracleRestartBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            askOracle();
         });
         renderGamesView();
     </script>
