@@ -336,6 +336,7 @@
         .question-table td a:hover { color: var(--primary-dark); text-decoration: underline; }
         .question-table td a:hover::after { opacity: 1; transform: translateX(0); }
         .question-empty-answer { color: var(--text-muted); font-style: italic; }
+        .question-unmatched { color: var(--text-muted); font-style: italic; border-bottom: 1px dashed var(--text-muted); cursor: help; }
         .length-badge {
             display: inline-flex;
             align-items: center;
@@ -1755,7 +1756,8 @@
         // Permet de retrouver la bonne question même si quelqu'un ajoute/supprime/réordonne des questions
         // (ce qui décale les numéros), tant que le texte de la question n'a pas complètement changé.
         // Score minimal (0 = aucune ressemblance, 1 = texte identique) pour accepter une correspondance par contenu.
-        var QUESTION_MATCH_SIMILARITY_THRESHOLD = 0.45;
+        // Seuil volontairement strict : mieux vaut ne trouver aucune question que d'en associer une mauvaise.
+        var QUESTION_MATCH_SIMILARITY_THRESHOLD = 0.65;
 
         function stripLeadingNumber(text){
             return (text || '').replace(/^\s*\d+[\s:\-–.]+/, '').trim();
@@ -1811,11 +1813,13 @@
         }
 
         // Associe un bloc de réponse (numéro + question recopiée) à la question actuelle correspondante.
-        // Priorité au contenu (résiste à l'ajout/suppression de questions), repli sur le numéro sinon.
+        // Si du texte de question a été recopié, on se fie uniquement à la similarité de contenu : le numéro
+        // collé peut être obsolète (questions ajoutées/supprimées depuis) et ne doit pas servir de repli dans ce cas,
+        // sous peine d'associer la réponse à une question actuelle totalement différente.
+        // Le repli par numéro ne sert que si aucune question n'a été recopiée (réponse donnée sur une seule ligne).
         function findQuestionForAnswer(answerBlock){
             if (answerBlock.questionComplet) {
-                var matchByText = findBestQuestionMatch(answerBlock.questionComplet);
-                if (matchByText) return matchByText;
+                return findBestQuestionMatch(answerBlock.questionComplet);
             }
             return findQuestionByNumero(answerBlock.numero);
         }
@@ -1917,7 +1921,11 @@
                 return row.question.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1 || row.alt.toLowerCase().indexOf(term) !== -1;
             });
             bodyEl.innerHTML = filtered.map(function(row){
-                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.questionNumber) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
+                // Pas de question reconnue : on affiche le texte recopié tel quel, sans lien (pour éviter de pointer vers une mauvaise question)
+                var questionCell = row.questionNumber
+                    ? '<a href="?page=question&id=' + encodeURIComponent(row.questionNumber) + '">' + escapeHtml(row.question) + '</a>'
+                    : '<span class="question-unmatched" title="Aucune question actuelle ne correspond à ce texte">' + escapeHtml(row.question) + '</span>';
+                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question">' + questionCell + '</td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
             }).join('') || '<tr><td colspan="5" class="question-empty-answer">Aucun résultat.</td></tr>';
             document.getElementById('profile-answers-average').innerHTML = renderAnswersAverage(profileAnswerRows, function(row){ return row.reponse; });
         }
@@ -1956,7 +1964,8 @@
                 // Correspondance via questionId (résolue par similarité de texte, résiste au décalage des numéros)
                 var question = a.questionId ? findQuestion(a.questionId) : null;
                 var favorite = !!(question && profile.favoriteIds.indexOf(question.id) !== -1);
-                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : a.numero, alt: question ? question.alt : '', favorite: favorite };
+                // questionNumber reste null si aucune question n'a été reconnue : pas de lien vers une mauvaise page
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : null, alt: question ? question.alt : '', favorite: favorite };
             });
             filterEl.value = '';
             renderProfileTable('');
@@ -2068,7 +2077,7 @@
             profileAnswerRows = (answers[currentProfile.name] || []).map(function(a){
                 var question = a.questionId ? findQuestion(a.questionId) : null;
                 var favorite = !!(question && currentProfile.favoriteIds.indexOf(question.id) !== -1);
-                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : a.numero, alt: question ? question.alt : '', favorite: favorite };
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : null, alt: question ? question.alt : '', favorite: favorite };
             });
             renderProfileTable(document.getElementById('profile-filter').value);
         }
