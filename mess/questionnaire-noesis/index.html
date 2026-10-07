@@ -357,6 +357,8 @@
 
         .reading-mode { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2rem; padding: 3rem 1rem; }
         .reading-name { font-size: .85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+        .reading-mode .answers-average { margin: 0; }
+        .reading-mode .length-badge { font-size: .95rem; padding: .3rem .8rem; }
         .reading-mode #reading-alt { font-size: 1.1rem; padding: .5rem 1.1rem; }
         .reading-question { font-size: 1.6rem; font-weight: 700; max-width: 760px; min-height: 4.8rem; display: flex; align-items: center; justify-content: center; }
         .reading-answer { font-size: 1.6rem; line-height: 1.6; color: var(--text); max-width: 760px; white-space: pre-wrap; margin: .5rem 0; min-height: 15rem; display: flex; align-items: center; justify-content: center; }
@@ -513,9 +515,11 @@
             </div>
             <div id="profile-reading" class="reading-mode" hidden>
                 <div class="reading-name" id="reading-name"></div>
+                <p id="reading-answers-average" class="answers-average"></p>
                 <span id="reading-alt" class="question-alt-badge" title="Version résumée de la question" hidden></span>
                 <div class="reading-question" id="reading-question"></div>
                 <div class="reading-answer" id="reading-answer"></div>
+                <span id="reading-length" class="length-badge" hidden></span>
                 <div id="reading-summary" class="reading-summary" hidden>
                     <h3>Questions favorites</h3>
                     <ul id="reading-summary-list" class="reading-summary-list"></ul>
@@ -1921,9 +1925,11 @@
 
         function renderReadingMode(){
             var nameEl = document.getElementById('reading-name');
+            var averageEl = document.getElementById('reading-answers-average');
             var altEl = document.getElementById('reading-alt');
             var questionEl = document.getElementById('reading-question');
             var answerEl = document.getElementById('reading-answer');
+            var lengthEl = document.getElementById('reading-length');
             var summaryEl = document.getElementById('reading-summary');
             var favBtn = document.getElementById('reading-favorite');
             var prevBtn = document.getElementById('reading-prev');
@@ -1934,6 +1940,8 @@
             var lastBtn = document.getElementById('reading-last');
 
             nameEl.textContent = currentProfile ? (currentProfile.name || '(Sans nom)') : '';
+            // Moyenne globale des réponses, visible en permanence en mode lecture (y compris sur l'écran récapitulatif)
+            averageEl.innerHTML = renderAnswersAverage(profileAnswerRows, function(row){ return row.reponse; });
 
             var atSummary = readingIndex >= profileAnswerRows.length;
             firstBtn.disabled = readingIndex <= 0;
@@ -1945,6 +1953,7 @@
                 altEl.hidden = true;
                 questionEl.hidden = true;
                 answerEl.hidden = true;
+                lengthEl.hidden = true;
                 favBtn.hidden = true;
                 summaryEl.hidden = false;
                 renderFavoriteSummary();
@@ -1959,6 +1968,7 @@
             altEl.hidden = false;
             questionEl.hidden = false;
             answerEl.hidden = false;
+            lengthEl.hidden = false;
             favBtn.hidden = false;
             summaryEl.hidden = true;
 
@@ -1966,6 +1976,7 @@
             altEl.hidden = !row.alt;
             questionEl.textContent = row.question;
             answerEl.textContent = row.reponse || 'Aucune réponse trouvée.';
+            lengthEl.innerHTML = renderAnswerLengthBadge(row.reponse);
 
             prevBtn.disabled = readingIndex <= 0;
             nextBtn.disabled = false;
