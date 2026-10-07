@@ -336,6 +336,22 @@
         .question-table td a:hover { color: var(--primary-dark); text-decoration: underline; }
         .question-table td a:hover::after { opacity: 1; transform: translateX(0); }
         .question-empty-answer { color: var(--text-muted); font-style: italic; }
+        .length-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: .78rem;
+            font-weight: 700;
+            padding: .2rem .55rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .length-badge--red { background: #fdecec; color: #dc2626; }
+        .length-badge--orange { background: #fff4e3; color: #d97706; }
+        .length-badge--green { background: #e8f8ee; color: #16a34a; }
+        .answers-average { margin: 0 0 1rem; font-size: .85rem; color: var(--text-muted); }
+        .answers-average .length-badge { margin: 0 .3rem; font-size: .8rem; }
+        .answers-average-meta { color: var(--text-muted); }
+        .answers-average-empty { color: var(--text-muted); font-style: italic; }
         .btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
         .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
@@ -461,9 +477,10 @@
                 <input type="search" id="question-filter" placeholder="Filtrer par nom ou réponse...">
                 <a id="question-next" class="btn" href="#">Suivante →</a>
             </div>
+            <p id="question-answers-average" class="answers-average"></p>
             <div class="table-scroll">
                 <table class="question-table">
-                    <thead><tr><th>Nom</th><th>Réponse</th></tr></thead>
+                    <thead><tr><th>Nom</th><th>Réponse</th><th>Longueur</th></tr></thead>
                     <tbody id="question-answer"></tbody>
                 </table>
             </div>
@@ -486,9 +503,10 @@
                     <input type="search" id="profile-filter" placeholder="Filtrer par question ou réponse...">
                     <a id="profile-next" class="btn" href="#">Suivant →</a>
                 </div>
+                <p id="profile-answers-average" class="answers-average"></p>
                 <div class="table-scroll">
                     <table class="question-table profile-answers-table">
-                        <thead><tr><th>Alt</th><th>Question</th><th>Réponse</th><th>Favori</th></tr></thead>
+                        <thead><tr><th>Alt</th><th>Question</th><th>Réponse</th><th>Longueur</th><th>Favori</th></tr></thead>
                         <tbody id="profile-answers"></tbody>
                     </table>
                 </div>
@@ -1223,6 +1241,42 @@
             return CATEGORIES.find(function(c){ return c.id === id; }) || CATEGORIES[0];
         }
 
+        // --- Seuils de longueur des réponses (nombre de caractères) — modifier ces 2 valeurs pour ajuster le code couleur ---
+        // En dessous de ANSWER_LENGTH_RED_LIMIT caractères : réponse peu développée (rouge)
+        var ANSWER_LENGTH_RED_LIMIT = 50;
+        // À partir de ANSWER_LENGTH_GREEN_LIMIT caractères : réponse bien développée (vert)
+        // Entre les deux (inclus/exclu) : réponse correcte (orange)
+        var ANSWER_LENGTH_GREEN_LIMIT = 150;
+
+        var ANSWER_LENGTH_LABELS = { red: 'Peu développée', orange: 'Correcte', green: 'Bien développée' };
+
+        function getAnswerLengthLevel(length){
+            if (length >= ANSWER_LENGTH_GREEN_LIMIT) return 'green';
+            if (length >= ANSWER_LENGTH_RED_LIMIT) return 'orange';
+            return 'red';
+        }
+
+        function renderAnswerLengthBadge(text){
+            var length = (text || '').length;
+            var level = getAnswerLengthLevel(length);
+            return '<span class="length-badge length-badge--' + level + '" title="' + escapeHtml(ANSWER_LENGTH_LABELS[level]) + '">' + length + '</span>';
+        }
+
+        function computeAnswersLengthStats(rows, getText){
+            var answered = rows.filter(function(row){ return (getText(row) || '').trim().length > 0; });
+            if (!answered.length) return { average: 0, count: 0, total: rows.length };
+            var sum = answered.reduce(function(acc, row){ return acc + (getText(row) || '').length; }, 0);
+            return { average: Math.round(sum / answered.length), count: answered.length, total: rows.length };
+        }
+
+        function renderAnswersAverage(rows, getText){
+            var stats = computeAnswersLengthStats(rows, getText);
+            if (!stats.count) return '<span class="answers-average-empty">Aucune réponse rédigée pour le moment.</span>';
+            var level = getAnswerLengthLevel(stats.average);
+            return 'Longueur moyenne des réponses : <span class="length-badge length-badge--' + level + '">' + stats.average + ' caractères</span>' +
+                '<span class="answers-average-meta">(' + stats.count + '/' + stats.total + ' réponses rédigées)</span>';
+        }
+
         var STORAGE_KEY_QUESTIONS = 'questions';
         var STORAGE_KEY_PROFILS = 'profils';
 
@@ -1716,8 +1770,9 @@
                 return row.name.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1;
             });
             bodyEl.innerHTML = filtered.map(function(row){
-                return '<tr><td data-label="Nom"><a href="?page=profile&id=' + encodeURIComponent(row.name) + '">' + escapeHtml(row.name) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td></tr>';
-            }).join('') || '<tr><td colspan="2" class="question-empty-answer">Aucun résultat.</td></tr>';
+                return '<tr><td data-label="Nom"><a href="?page=profile&id=' + encodeURIComponent(row.name) + '">' + escapeHtml(row.name) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td></tr>';
+            }).join('') || '<tr><td colspan="3" class="question-empty-answer">Aucun résultat.</td></tr>';
+            document.getElementById('question-answers-average').innerHTML = renderAnswersAverage(questionAnswerRows, function(row){ return row.reponse; });
         }
 
         function updateQuestionNavLink(el, question){
@@ -1783,8 +1838,9 @@
                 return row.question.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1 || row.alt.toLowerCase().indexOf(term) !== -1;
             });
             bodyEl.innerHTML = filtered.map(function(row){
-                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.numero) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
-            }).join('') || '<tr><td colspan="4" class="question-empty-answer">Aucun résultat.</td></tr>';
+                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.numero) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="question-empty-answer">Aucun résultat.</td></tr>';
+            document.getElementById('profile-answers-average').innerHTML = renderAnswersAverage(profileAnswerRows, function(row){ return row.reponse; });
         }
 
         function updateProfileNavLink(el, profile){
