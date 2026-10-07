@@ -1751,11 +1751,85 @@
             return resultats;
         }
 
+        // --- Reconnaissance des questions par similarité de texte ---
+        // Permet de retrouver la bonne question même si quelqu'un ajoute/supprime/réordonne des questions
+        // (ce qui décale les numéros), tant que le texte de la question n'a pas complètement changé.
+        // Score minimal (0 = aucune ressemblance, 1 = texte identique) pour accepter une correspondance par contenu.
+        var QUESTION_MATCH_SIMILARITY_THRESHOLD = 0.45;
+
+        function stripLeadingNumber(text){
+            return (text || '').replace(/^\s*\d+[\s:\-–.]+/, '').trim();
+        }
+
+        function normalizeForCompare(text){
+            return stripLeadingNumber(text).toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        // Distance de Levenshtein : nombre minimal d'insertions/suppressions/substitutions
+        // pour transformer une chaîne en une autre.
+        function levenshteinDistance(a, b){
+            if (a === b) return 0;
+            var al = a.length, bl = b.length;
+            if (al === 0) return bl;
+            if (bl === 0) return al;
+            var prevRow = new Array(bl + 1);
+            for (var j = 0; j <= bl; j++) prevRow[j] = j;
+            for (var i = 1; i <= al; i++){
+                var currRow = [i];
+                for (var k = 1; k <= bl; k++){
+                    var cost = a.charCodeAt(i - 1) === b.charCodeAt(k - 1) ? 0 : 1;
+                    currRow[k] = Math.min(
+                        prevRow[k] + 1,       // suppression
+                        currRow[k - 1] + 1,   // insertion
+                        prevRow[k - 1] + cost // substitution
+                    );
+                }
+                prevRow = currRow;
+            }
+            return prevRow[bl];
+        }
+
+        // Similarité normalisée entre 0 (totalement différent) et 1 (identique)
+        function stringSimilarity(a, b){
+            a = a || ''; b = b || '';
+            var maxLen = Math.max(a.length, b.length);
+            if (maxLen === 0) return 1;
+            return 1 - (levenshteinDistance(a, b) / maxLen);
+        }
+
+        // Cherche, parmi les questions actuelles, celle dont le texte ressemble le plus au texte fourni
+        function findBestQuestionMatch(questionText){
+            var normalized = normalizeForCompare(questionText);
+            if (!normalized) return null;
+            var best = null;
+            var bestScore = -1;
+            state.questions.forEach(function(q){
+                var score = stringSimilarity(normalized, normalizeForCompare(q.question));
+                if (score > bestScore) { bestScore = score; best = q; }
+            });
+            return (best && bestScore >= QUESTION_MATCH_SIMILARITY_THRESHOLD) ? best : null;
+        }
+
+        // Associe un bloc de réponse (numéro + question recopiée) à la question actuelle correspondante.
+        // Priorité au contenu (résiste à l'ajout/suppression de questions), repli sur le numéro sinon.
+        function findQuestionForAnswer(answerBlock){
+            if (answerBlock.questionComplet) {
+                var matchByText = findBestQuestionMatch(answerBlock.questionComplet);
+                if (matchByText) return matchByText;
+            }
+            return findQuestionByNumero(answerBlock.numero);
+        }
+
         var answers = {};
         function findAnswerIntoText(){
             state.profils.forEach(function(profil){
                 var texteQuestion = profil.questionsText || '';
-                answers[profil.name] = texteQuestion ? splitByNumberIncreasing(texteQuestion) : [];
+                var parsed = texteQuestion ? splitByNumberIncreasing(texteQuestion) : [];
+                parsed.forEach(function(block){
+                    var matched = findQuestionForAnswer(block);
+                    block.questionId = matched ? matched.id : null;
+                });
+                answers[profil.name] = parsed;
             });
         }
         findAnswerIntoText();
@@ -1811,7 +1885,8 @@
             altEl.textContent = question.alt ? ('Résumé : ' + question.alt) : '';
             altEl.hidden = !question.alt;
             questionAnswerRows = state.profils.slice().reverse().map(function(p){ // last added first
-                var answer = (answers[p.name] || []).find(function(a){ return a.numero.toString() === questionId.toString(); });
+                // Correspondance via questionId (résout aussi les anciennes réponses dont le numéro a décalé)
+                var answer = (answers[p.name] || []).find(function(a){ return a.questionId === question.id; });
                 return { name: p.name, reponse: answer ? answer.reponse : '' };
             });
             filterEl.value = '';
@@ -1842,7 +1917,7 @@
                 return row.question.toLowerCase().indexOf(term) !== -1 || row.reponse.toLowerCase().indexOf(term) !== -1 || row.alt.toLowerCase().indexOf(term) !== -1;
             });
             bodyEl.innerHTML = filtered.map(function(row){
-                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.numero) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
+                return '<tr><td data-label="Alt">' + escapeHtml(row.alt) + '</td><td data-label="Question"><a href="?page=question&id=' + encodeURIComponent(row.questionNumber) + '">' + escapeHtml(row.question) + '</a></td><td data-label="Réponse">' + (row.reponse ? escapeHtml(row.reponse) : '<span class="question-empty-answer">Aucune réponse trouvée.</span>') + '</td><td data-label="Longueur">' + renderAnswerLengthBadge(row.reponse) + '</td><td data-label="Favori">' + (row.favorite ? '★' : '☆') + '</td></tr>';
             }).join('') || '<tr><td colspan="5" class="question-empty-answer">Aucun résultat.</td></tr>';
             document.getElementById('profile-answers-average').innerHTML = renderAnswersAverage(profileAnswerRows, function(row){ return row.reponse; });
         }
@@ -1878,9 +1953,10 @@
 
             titleEl.textContent = profile.name || '(Sans nom)';
             profileAnswerRows = (answers[profile.name] || []).map(function(a){
-                var question = findQuestionByNumero(a.numero);
+                // Correspondance via questionId (résolue par similarité de texte, résiste au décalage des numéros)
+                var question = a.questionId ? findQuestion(a.questionId) : null;
                 var favorite = !!(question && profile.favoriteIds.indexOf(question.id) !== -1);
-                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, alt: question ? question.alt : '', favorite: favorite };
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : a.numero, alt: question ? question.alt : '', favorite: favorite };
             });
             filterEl.value = '';
             renderProfileTable('');
@@ -1913,11 +1989,7 @@
 
         function renderFavoriteSummary(){
             var listEl = document.getElementById('reading-summary-list');
-            var favoriteIds = currentProfile ? currentProfile.favoriteIds : [];
-            var favoriteRows = profileAnswerRows.filter(function(row){
-                var question = findQuestionByNumero(row.numero);
-                return question && favoriteIds.indexOf(question.id) !== -1;
-            });
+            var favoriteRows = profileAnswerRows.filter(function(row){ return row.favorite; });
             listEl.innerHTML = favoriteRows.map(function(row){
                 return '<li><strong>' + escapeHtml(row.question) + '</strong>' + escapeHtml(row.reponse || 'Aucune réponse trouvée.') + '</li>';
             }).join('') || '<li class="reading-summary-empty">Aucune question favorite pour ce profil.</li>';
@@ -1981,8 +2053,7 @@
             prevBtn.disabled = readingIndex <= 0;
             nextBtn.disabled = false;
 
-            var question = findQuestionByNumero(row.numero);
-            var isFavorite = !!(question && currentProfile && currentProfile.favoriteIds.indexOf(question.id) !== -1);
+            var isFavorite = row.favorite;
             favBtn.textContent = (isFavorite ? '★' : '☆') + ' Favori';
             favBtn.classList.toggle('active', isFavorite);
         }
@@ -1995,9 +2066,9 @@
         function refreshProfileAnswerRows(){
             if (!currentProfile) return;
             profileAnswerRows = (answers[currentProfile.name] || []).map(function(a){
-                var question = findQuestionByNumero(a.numero);
+                var question = a.questionId ? findQuestion(a.questionId) : null;
                 var favorite = !!(question && currentProfile.favoriteIds.indexOf(question.id) !== -1);
-                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, alt: question ? question.alt : '', favorite: favorite };
+                return { question: a.questionComplet || (question ? question.question : ''), reponse: a.reponse, numero: a.numero, questionId: a.questionId, questionNumber: question ? getQuestionNumber(question) : a.numero, alt: question ? question.alt : '', favorite: favorite };
             });
             renderProfileTable(document.getElementById('profile-filter').value);
         }
@@ -2057,10 +2128,10 @@
         document.getElementById('reading-favorite').addEventListener('click', function(){
             if (!currentProfile) return;
             var row = profileAnswerRows[readingIndex];
-            var question = row && findQuestionByNumero(row.numero);
-            if (!question) return;
-            var idx = currentProfile.favoriteIds.indexOf(question.id);
-            if (idx === -1) currentProfile.favoriteIds.push(question.id); else currentProfile.favoriteIds.splice(idx, 1);
+            var questionId = row && row.questionId;
+            if (!questionId) return;
+            var idx = currentProfile.favoriteIds.indexOf(questionId);
+            if (idx === -1) currentProfile.favoriteIds.push(questionId); else currentProfile.favoriteIds.splice(idx, 1);
             persist();
             renderReadingMode();
         });
