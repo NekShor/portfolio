@@ -1702,6 +1702,10 @@
                 const startPos = matchStart.index;
 
                 // 2. Cherche le prochain numéro supérieur disponible dans le texte (N+1, N+2, ...)
+                // On teste tous les candidats (pour gérer les questions sautées) et on garde celui qui apparaît
+                // le plus tôt dans le texte, pas le premier trouvé dans l'ordre croissant des numéros : sinon un
+                // numéro plus petit mentionné par hasard très loin dans une réponse (ex: une énumération "6 raisons...")
+                // ferait fusionner tout le texte entre les deux dans une seule réponse.
                 let nextPos = texte.length;
                 let prochainNumeroTrouve = null;
 
@@ -1710,10 +1714,9 @@
                 regexNext.lastIndex = startPos + matchStart[0].length;
                 const matchNext = regexNext.exec(texte);
 
-                if (matchNext) {
+                if (matchNext && matchNext.index < nextPos) {
                     nextPos = matchNext.index;
                     prochainNumeroTrouve = testNext;
-                    break;
                 }
                 }
 
