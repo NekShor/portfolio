@@ -1678,52 +1678,44 @@
 
         function splitByNumberIncreasing(texte){
             var resultats = [];
-            let indexActuel = 0;
-  
-            // Expression régulière pour trouver le premier numéro (ex: "1 ", "1\t", "1-", etc.)
-            const matchInitial = texte.match(/(\d+)[\s:\-–.]/);
-            if (!matchInitial) return resultats;
 
-            let numeroCourant = parseInt(matchInitial[1], 10);
-
-            while (indexActuel < texte.length) {
-                // 1. Cherche la position du numéro courant (ex: "1 ")
-                const regexCourant = new RegExp(`(?:^|\\n)\\s*${numeroCourant}[\\s:\\-–.]`, 'g');
-                regexCourant.lastIndex = indexActuel;
-                const matchStart = regexCourant.exec(texte);
-
-                if (!matchStart) {
-                // Si le numéro courant n'est pas trouvé, on tente le numéro suivant
-                numeroCourant++;
-                if (numeroCourant > 200) break; // Sécurité anti-boucle infinie
-                continue;
+            // Repère un numéro en tout début de ligne (ex: "12 ", "12:", "12-", "12."), suivi d'un séparateur.
+            // On ne retient un numéro comme "marqueur" candidat que s'il est compris entre minNumero et maxNumero :
+            // ça permet d'ignorer les numéros qui apparaissent par hasard dans le corps d'une réponse (une liste
+            // "1. truc\n2. machin" rédigée par la personne, une quantité en début de ligne, etc.) sans pour autant
+            // couper la réponse en morceaux ou fusionner plusieurs questions ensemble.
+            function findMarkerAfter(fromIndex, minNumero, maxNumero){
+                const re = /(?:^|\n)[ \t]*(\d{1,4})[\s:\-–.]/g;
+                re.lastIndex = fromIndex;
+                let match;
+                while ((match = re.exec(texte))) {
+                    const numero = parseInt(match[1], 10);
+                    if (numero >= minNumero && numero <= maxNumero) {
+                        return { index: match.index, numero: numero, length: match[0].length };
+                    }
+                    // Numéro hors plage : probablement du contenu dans la réponse en cours, pas une nouvelle question.
+                    // On continue de chercher plus loin sans s'arrêter dessus.
                 }
+                return null;
+            }
 
-                const startPos = matchStart.index;
+            let current = findMarkerAfter(0, 0, Infinity);
+            if (!current) return resultats;
 
-                // 2. Cherche le prochain numéro supérieur disponible dans le texte (N+1, N+2, ...)
-                // On teste tous les candidats (pour gérer les questions sautées) et on garde celui qui apparaît
-                // le plus tôt dans le texte, pas le premier trouvé dans l'ordre croissant des numéros : sinon un
-                // numéro plus petit mentionné par hasard très loin dans une réponse (ex: une énumération "6 raisons...")
-                // ferait fusionner tout le texte entre les deux dans une seule réponse.
-                let nextPos = texte.length;
-                let prochainNumeroTrouve = null;
+            while (current) {
+                const startPos = current.index;
+                const numeroCourant = current.numero;
 
-                for (let testNext = numeroCourant + 1; testNext <= numeroCourant + 50; testNext++) {
-                const regexNext = new RegExp(`(?:^|\\n)\\s*${testNext}[\\s:\\-–.]`, 'g');
-                regexNext.lastIndex = startPos + matchStart[0].length;
-                const matchNext = regexNext.exec(texte);
+                // Cherche le prochain marqueur dont le numéro est strictement supérieur au numéro courant
+                // (tolère les questions sautées, quel que soit l'écart), dans la limite de +50 pour éviter de
+                // confondre avec un numéro incident mentionné bien plus loin dans la réponse elle-même.
+                const next = findMarkerAfter(startPos + current.length, numeroCourant + 1, numeroCourant + 50);
+                const nextPos = next ? next.index : texte.length;
 
-                if (matchNext && matchNext.index < nextPos) {
-                    nextPos = matchNext.index;
-                    prochainNumeroTrouve = testNext;
-                }
-                }
-
-                // 3. Extrait le bloc complet (Question + Réponse)
+                // Extrait le bloc complet (Question + Réponse)
                 const blocComplet = texte.substring(startPos, nextPos).trim();
-                
-                // 4. Sépare la ligne de la question du reste (la réponse)
+
+                // Sépare la ligne de la question du reste (la réponse)
                 const lignes = blocComplet.split('\n');
                 var questionLigne, reponse;
                 if (lignes.length > 1) {
@@ -1744,12 +1736,7 @@
                 });
 
                 // Avance vers le prochain bloc
-                indexActuel = nextPos;
-                if (prochainNumeroTrouve) {
-                numeroCourant = prochainNumeroTrouve;
-                } else {
-                break; // Aucun numéro suivant trouvé, fin du texte
-                }
+                current = next;
             }
 
             return resultats;
