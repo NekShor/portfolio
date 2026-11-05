@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Écran Clignotant</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.1s;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button.stop {
+            background-color: #dc3545;
+        }
+
+        button.stop:hover {
+            background-color: #c82333;
+        }
+
+        .info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .color-item {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Écran Clignotant ⚡</h1>
+        <div class="controls">
+            <button onclick="startBlink(500)">Lent (500ms)</button>
+            <button onclick="startBlink(250)">Moyen (250ms)</button>
+            <button onclick="startBlink(100)">Rapide (100ms)</button>
+            <button onclick="startBlink(50)">Très Rapide (50ms)</button>
+            <button onclick="startRandomBlink(250)" style="background-color: #ff6b6b;">🎲 Aléatoire</button>
+            <button class="stop" onclick="stopBlink()">Arrêter</button>
+        </div>
+        <div class="info">
+            <p id="status">Cliquez sur un bouton pour démarrer</p>
+            <div style="margin-top: 15px;">
+                <input type="number" id="customFreq" placeholder="Fréquence (ms)" min="1" max="10000" value="100" style="padding: 8px; width: 150px; border: 1px solid #ccc; border-radius: 5px;">
+                <button onclick="startCustomBlink()" style="margin-left: 5px;">Démarrer</button>
+                <button onclick="startCustomRandomBlink()" style="margin-left: 5px; background-color: #ff6b6b;">🎲 Aléatoire</button>
+            </div>
+            <div id="colorsContainer" style="margin-top: 15px;">
+                <div class="color-item">
+                    <label>Couleur 1: </label>
+                    <input type="color" class="color-input" value="#ffffff" style="width: 60px; height: 30px; border: none; cursor: pointer;">
+                </div>
+                <div class="color-item">
+                    <label>Couleur 2: </label>
+                    <input type="color" class="color-input" value="#000000" style="width: 60px; height: 30px; border: none; cursor: pointer;">
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <button onclick="addColor()">+ Ajouter une couleur</button>
+                <button onclick="removeColor()">- Retirer une couleur</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let blinkInterval = null;
+        let currentColorIndex = 0;
+        let colors = [];
+        let isRandomMode = false;
+        let lastFrequency = 100;
+        let isPaused = false;
+
+        function getRandomColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        }
+
+        function getColors() {
+            const colorInputs = document.querySelectorAll('.color-input');
+            colors = Array.from(colorInputs).map(input => input.value);
+            return colors;
+        }
+
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { // Safari
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE11
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function startBlink(frequency) {
+            stopBlink();
+
+            lastFrequency = frequency;
+            isRandomMode = false;
+
+            getColors();
+
+            if (colors.length === 0) {
+                alert('Veuillez ajouter au moins une couleur');
+                return;
+            }
+
+            enterFullscreen();
+
+            document.querySelector('.container').style.display = 'none';
+
+            document.getElementById('status').textContent = `Clignotement actif: ${frequency}ms`;
+
+            currentColorIndex = 0;
+            isPaused = false;
+
+            blinkInterval = setInterval(() => {
+                document.body.style.backgroundColor = colors[currentColorIndex];
+                currentColorIndex = (currentColorIndex + 1) % colors.length;
+            }, frequency);
+        }
+
+        function startRandomBlink(frequency) {
+            stopBlink();
+
+            lastFrequency = frequency;
+            isRandomMode = true;
+
+            enterFullscreen();
+
+            document.querySelector('.container').style.display = 'none';
+
+            document.getElementById('status').textContent = `Clignotement aléatoire actif: ${frequency}ms`;
+
+            isPaused = false;
+
+            blinkInterval = setInterval(() => {
+                document.body.style.backgroundColor = getRandomColor();
+            }, frequency);
+        }
+
+        function stopBlink() {
+            if (blinkInterval) {
+                clearInterval(blinkInterval);
+                blinkInterval = null;
+            }
+            if (colors.length > 0) {
+                document.body.style.backgroundColor = colors[0];
+            }
+            currentColorIndex = 0;
+            document.getElementById('status').textContent = 'Clignotement arrêté';
+            
+            isPaused = true;
+            
+            // Réafficher le conteneur
+            document.querySelector('.container').style.display = 'block';
+            
+            // Sortir du plein écran
+            if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function resumeBlink() {
+            if (isRandomMode) {
+                startRandomBlink(lastFrequency);
+            } else {
+                startBlink(lastFrequency);
+            }
+        }
+
+        function startCustomBlink() {
+            const customFreq = document.getElementById('customFreq').value;
+            if (customFreq && customFreq > 0) {
+                startBlink(parseInt(customFreq));
+            } else {
+                alert('Veuillez entrer une fréquence valide (nombre positif)');
+            }
+        }
+
+        function startCustomRandomBlink() {
+            const customFreq = document.getElementById('customFreq').value;
+            if (customFreq && customFreq > 0) {
+                startRandomBlink(parseInt(customFreq));
+            } else {
+                alert('Veuillez entrer une fréquence valide (nombre positif)');
+            }
+        }
+
+        function addColor() {
+            const container = document.getElementById('colorsContainer');
+            const colorCount = document.querySelectorAll('.color-input').length + 1;
+            const newColorDiv = document.createElement('div');
+            newColorDiv.className = 'color-item';
+            newColorDiv.innerHTML = `
+                <label>Couleur ${colorCount}: </label>
+                <input type="color" class="color-input" value="#${Math.floor(Math.random()*16777215).toString(16)}" style="width: 60px; height: 30px; border: none; cursor: pointer;">
+            `;
+            container.appendChild(newColorDiv);
+        }
+
+        function removeColor() {
+            const colorItems = document.querySelectorAll('.color-item');
+            if (colorItems.length > 1) {
+                colorItems[colorItems.length - 1].remove();
+            } else {
+                alert('Vous devez garder au moins une couleur');
+            }
+        }
+
+        const FREQUENCIES = {
+            SLOW: 500,      // 2 fois par seconde
+            MEDIUM: 250,    // 4 fois par seconde
+            FAST: 100,      // 10 fois par seconde
+            VERY_FAST: 50   // 20 fois par seconde
+        };
+
+        // Écouter la touche Espace pour arrêter
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                event.preventDefault(); // Empêcher le scroll de la page
+                if (isPaused) {
+                    resumeBlink();
+                } else {
+                    stopBlink();
+                }
+            }
+        });
+
+        // Vous pouvez modifier cette valeur pour démarrer automatiquement
+        // startBlink(FREQUENCIES.MEDIUM);
+    </script>
+</body>
+</html>
