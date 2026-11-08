@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points</title>
+    <style>
+        :root {
+            --fill-opacity: 1;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        #canvas {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            overflow: hidden;
+        }
+
+        #canvas.panning {
+            cursor: grabbing;
+        }
+
+        #world {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+            pointer-events: none;
+        }
+
+        #fills,
+        #lines,
+        #angles,
+        #anglePreviews {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            pointer-events: none;
+        }
+
+        .fill-shape {
+            cursor: pointer;
+            pointer-events: all;
+            opacity: var(--fill-opacity);
+        }
+
+        #refImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+            max-width: none;
+        }
+
+        #refImage.unlocked {
+            pointer-events: auto;
+            cursor: move;
+        }
+
+        #refImage.dragging {
+            cursor: grabbing;
+        }
+
+        .angle-fill {
+            pointer-events: all;
+            cursor: pointer;
+        }
+
+        .angle-preview {
+            pointer-events: all;
+            cursor: pointer;
+            fill: rgba(20, 20, 20, 0.3);
+            stroke: #555;
+            stroke-width: 1;
+            stroke-dasharray: 2 2;
+        }
+
+        .angle-preview:hover {
+            fill: rgba(20, 20, 20, 0.55);
+        }
+
+        .angle-preview-remove {
+            fill: rgba(230, 57, 70, 0.35);
+            stroke: #e63946;
+        }
+
+        .angle-preview-remove:hover {
+            fill: rgba(230, 57, 70, 0.6);
+        }
+
+        .line-hit {
+            stroke: transparent;
+            stroke-width: 14;
+            cursor: pointer;
+            pointer-events: stroke;
+        }
+
+        .line-visible {
+            stroke: #222;
+            stroke-width: 2;
+            pointer-events: none;
+        }
+
+        .point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            margin-left: -4px;
+            margin-top: -4px;
+            background: #e63946;
+            border: 1px solid #222;
+            border-radius: 50%;
+            pointer-events: auto;
+            cursor: grab;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+            touch-action: none;
+        }
+
+        .point:active {
+            cursor: grabbing;
+        }
+
+        .point.selected {
+            background: #2a9d8f;
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.35);
+        }
+
+        #hint {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: #222;
+            font-family: sans-serif;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 6px 10px;
+            border-radius: 6px;
+            pointer-events: none;
+            border: 1px solid #ddd;
+        }
+
+        #toolbar {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-family: sans-serif;
+            font-size: 13px;
+            color: #222;
+            z-index: 10;
+        }
+
+        .toolbar-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #imageToolbarGroup {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #imageScale {
+            width: 64px;
+            padding: 2px 4px;
+        }
+
+        #imageUpload {
+            max-width: 160px;
+        }
+
+        .toolbar-label {
+            margin-right: 2px;
+        }
+
+        .swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .swatch.active {
+            border-color: #222;
+        }
+
+        .swatch.none {
+            background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50% / 10px 10px;
+            color: #c00;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        #customColor {
+            width: 26px;
+            height: 26px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #angleWidth {
+            width: 56px;
+            padding: 2px 4px;
+        }
+
+        #resetView {
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        #zoomLabel {
+            font-variant-numeric: tabular-nums;
+            color: #555;
+        }
+
+        #canvas.hide-points .point {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas">
+        <div id="world">
+            <img id="refImage" style="display: none;" alt="Image de référence">
+            <svg id="fills"></svg>
+            <svg id="lines"></svg>
+            <svg id="angles"></svg>
+            <svg id="anglePreviews"></svg>
+        </div>
+        <div id="hint">Clic sur le vide : ajouter un point (relie automatiquement aux points proches) &nbsp;|&nbsp; Glisser : déplacer &nbsp;|&nbsp; Clic sur 2 points : relier &nbsp;|&nbsp; Clic sur une figure fermée : la remplir &nbsp;|&nbsp; Clic sur une ligne : la supprimer &nbsp;|&nbsp; Maintenir Alt près d'un point : affiche l'angle survolé (gris = à remplir, rouge = à vider), cliquer pour basculer &nbsp;|&nbsp; Double-clic / clic droit sur un point : le supprimer &nbsp;|&nbsp; Molette : zoom &nbsp;|&nbsp; Clic molette + glisser : déplacer la vue</div>
+    </div>
+
+    <div id="toolbar">
+        <div class="toolbar-row">
+            <span class="toolbar-label">Remplissage :</span>
+            <button class="swatch active" data-color="#e63946" style="background:#e63946" title="Rouge"></button>
+            <button class="swatch" data-color="#f4a261" style="background:#f4a261" title="Orange"></button>
+            <button class="swatch" data-color="#2a9d8f" style="background:#2a9d8f" title="Vert"></button>
+            <button class="swatch" data-color="#264653" style="background:#264653" title="Bleu foncé"></button>
+            <button class="swatch" data-color="#8338ec" style="background:#8338ec" title="Violet"></button>
+            <input type="color" id="customColor" value="#ffd166" title="Couleur personnalisée">
+            <button class="swatch none" data-color="none" title="Aucune (effacer)">✕</button>
+        </div>
+        <div class="toolbar-row">
+            <label>
+                <input type="checkbox" id="togglePoints" checked>
+                Afficher les points
+            </label>
+        </div>
+        <div class="toolbar-row">
+            <label>
+                <input type="checkbox" id="autoConnect" checked>
+                Relier auto. au(x) point(s) le(s) plus proche(s)
+            </label>
+        </div>
+        <div class="toolbar-row">
+            <label class="toolbar-label" for="angleWidth">Largeur remplissage d'angle (px) :</label>
+            <input type="number" id="angleWidth" min="1" max="100" step="1" value="5">
+        </div>
+        <div class="toolbar-row">
+            <label class="toolbar-label" for="fillOpacity">Transparence des remplissages :</label>
+            <input type="range" id="fillOpacity" min="0" max="100" step="1" value="100">
+        </div>
+        <div class="toolbar-row">
+            <button id="resetView" type="button">Réinitialiser la vue</button>
+            <span id="zoomLabel">100%</span>
+        </div>
+        <div class="toolbar-row">
+            <label class="toolbar-label" for="imageUpload">Image de référence :</label>
+            <input type="file" id="imageUpload" accept="image/*">
+        </div>
+        <div id="imageToolbarGroup" style="display: none;">
+            <div class="toolbar-row">
+                <label><input type="checkbox" id="imageLocked" checked> Verrouiller position/échelle</label>
+            </div>
+            <div class="toolbar-row">
+                <label class="toolbar-label" for="imageOpacity">Transparence image :</label>
+                <input type="range" id="imageOpacity" min="0" max="100" step="1" value="50">
+            </div>
+            <div class="toolbar-row">
+                <label class="toolbar-label" for="imageScale">Échelle image (%) :</label>
+                <input type="number" id="imageScale" min="1" max="1000" step="1" value="100">
+            </div>
+            <div class="toolbar-row">
+                <button id="removeImage" type="button">Supprimer l'image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const worldEl = document.getElementById('world');
+        const linesLayer = document.getElementById('lines');
+        const fillsLayer = document.getElementById('fills');
+        const anglesLayer = document.getElementById('angles');
+        const previewsLayer = document.getElementById('anglePreviews');
+        const refImageEl = document.getElementById('refImage');
+
+        // Vue (pan/zoom) : position du monde (coordonnées du dessin) à l'écran est
+        // screen = world * viewScale + (viewOffsetX, viewOffsetY).
+        let viewScale = 1;
+        let viewOffsetX = 0;
+        let viewOffsetY = 0;
+        const MIN_SCALE = 0.1;
+        const MAX_SCALE = 10;
+
+        function applyTransform() {
+            worldEl.style.transform = 'translate(' + viewOffsetX + 'px, ' + viewOffsetY + 'px) scale(' + viewScale + ')';
+            document.getElementById('zoomLabel').textContent = Math.round(viewScale * 100) + '%';
+        }
+
+        function screenToWorld(x, y) {
+            return {
+                x: (x - viewOffsetX) / viewScale,
+                y: (y - viewOffsetY) / viewScale
+            };
+        }
+
+        // Image de référence (pour calquer un dessin) : position/échelle en coordonnées monde.
+        let imageWorldX = 0;
+        let imageWorldY = 0;
+        let imageScalePct = 100;
+        let imageLocked = true;
+        let draggingImage = false;
+        let imageDragOffsetX = 0;
+        let imageDragOffsetY = 0;
+
+        function applyImageTransform() {
+            refImageEl.style.left = imageWorldX + 'px';
+            refImageEl.style.top = imageWorldY + 'px';
+            refImageEl.style.transform = 'scale(' + imageScalePct / 100 + ')';
+        }
+
+        let draggedPoint = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let didDrag = false;
+        let selectedPoint = null;
+        let pointIdCounter = 0;
+        let currentFillColor = '#e63946';
+        const lines = [];
+        const fills = [];
+        const angleFills = [];
+        let hoverPreviewPath = null;
+        let hoverSector = null;
+
+        // Sauvegarde automatique dans le navigateur (localStorage) : tout le dessin
+        // et les réglages sont restaurés au rechargement de la page.
+        const STORAGE_KEY = 'tattoo-canvas-state-v1';
+        let suppressSave = false;
+        let saveTimer = null;
+
+        // Rayon (en pixels) du secteur noir dessiné quand on remplit un angle.
+        // Valeur par défaut ; modifiable aussi en direct via le champ "Largeur remplissage d'angle".
+        let ANGLE_FILL_RADIUS = 5;
+        // Rayon (en pixels) des zones cliquables affichées (en grisé) pendant qu'on maintient Alt.
+        const ANGLE_PREVIEW_RADIUS = 20;
+
+        // Connexion automatique : quand on ajoute un point, relie-le uniquement au
+        // point existant le plus proche.
+        let autoConnectEnabled = true;
+
+        function pointCenter(point) {
+            return {
+                x: parseFloat(point.style.left),
+                y: parseFloat(point.style.top)
+            };
+        }
+
+        function updateLine(line) {
+            const a = pointCenter(line.p1);
+            const b = pointCenter(line.p2);
+            line.visible.setAttribute('x1', a.x);
+            line.visible.setAttribute('y1', a.y);
+            line.visible.setAttribute('x2', b.x);
+            line.visible.setAttribute('y2', b.y);
+            line.hit.setAttribute('x1', a.x);
+            line.hit.setAttribute('y1', a.y);
+            line.hit.setAttribute('x2', b.x);
+            line.hit.setAttribute('y2', b.y);
+        }
+
+        function updateLinesForPoint(point) {
+            lines.forEach((line) => {
+                if (line.p1 === point || line.p2 === point) updateLine(line);
+            });
+        }
+
+        function angleTo(center, point) {
+            const c = pointCenter(point);
+            return Math.atan2(c.y - center.y, c.x - center.x);
+        }
+
+        function normalizeAngle(a) {
+            const twoPi = Math.PI * 2;
+            return ((a % twoPi) + twoPi) % twoPi;
+        }
+
+        function getSortedNeighbors(point) {
+            const neighbors = [];
+            lines.forEach((line) => {
+                if (line.p1 === point) neighbors.push(line.p2);
+                else if (line.p2 === point) neighbors.push(line.p1);
+            });
+            const center = pointCenter(point);
+            neighbors.sort((a, b) => angleTo(center, a) - angleTo(center, b));
+            return neighbors;
+        }
+
+        function isConsecutivePair(vertex, from, to) {
+            const neighbors = getSortedNeighbors(vertex);
+            const n = neighbors.length;
+            for (let i = 0; i < n; i++) {
+                if (neighbors[i] === from && neighbors[(i + 1) % n] === to) return true;
+            }
+            return false;
+        }
+
+        function sectorPathD(vertex, from, to, radius) {
+            const c = pointCenter(vertex);
+            const a1 = normalizeAngle(angleTo(c, from));
+            const a2 = normalizeAngle(angleTo(c, to));
+            const span = normalizeAngle(a2 - a1);
+            const x1 = c.x + radius * Math.cos(a1);
+            const y1 = c.y + radius * Math.sin(a1);
+            const x2 = c.x + radius * Math.cos(a2);
+            const y2 = c.y + radius * Math.sin(a2);
+            const largeArc = span > Math.PI ? 1 : 0;
+            return (
+                'M ' + c.x + ' ' + c.y +
+                ' L ' + x1 + ' ' + y1 +
+                ' A ' + radius + ' ' + radius + ' 0 ' + largeArc + ' 1 ' + x2 + ' ' + y2 +
+                ' Z'
+            );
+        }
+
+        function removeAngleFill(fill) {
+            fill.path.remove();
+            const index = angleFills.indexOf(fill);
+            if (index !== -1) angleFills.splice(index, 1);
+            scheduleSave();
+        }
+
+        function updateAngleFill(fill) {
+            if (!isConsecutivePair(fill.vertex, fill.p1, fill.p2)) {
+                removeAngleFill(fill);
+                return;
+            }
+            fill.path.setAttribute('d', sectorPathD(fill.vertex, fill.p1, fill.p2, ANGLE_FILL_RADIUS));
+        }
+
+        function updateAngleFillsForPoint(point) {
+            angleFills.slice().forEach((fill) => {
+                if (fill.vertex === point || fill.p1 === point || fill.p2 === point) updateAngleFill(fill);
+            });
+        }
+
+        function removeAngleFillsForPoint(point) {
+            angleFills.slice().forEach((fill) => {
+                if (fill.vertex === point || fill.p1 === point || fill.p2 === point) removeAngleFill(fill);
+            });
+        }
+
+        function createAngleFill(vertex, from, to) {
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const path = document.createElementNS(svgNS, 'path');
+            path.classList.add('angle-fill');
+            path.setAttribute('fill', '#000');
+            path.setAttribute('d', sectorPathD(vertex, from, to, ANGLE_FILL_RADIUS));
+
+            const fill = { vertex, p1: from, p2: to, path };
+
+            path.addEventListener('mousedown', (e) => e.stopPropagation());
+            path.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeAngleFill(fill);
+            });
+
+            anglesLayer.appendChild(path);
+            angleFills.push(fill);
+            scheduleSave();
+        }
+
+        function hasAngleFill(vertex, from, to) {
+            return angleFills.some((f) => f.vertex === vertex && f.p1 === from && f.p2 === to);
+        }
+
+        function clearHoverPreview() {
+            if (hoverPreviewPath) {
+                hoverPreviewPath.remove();
+                hoverPreviewPath = null;
+            }
+            hoverSector = null;
+        }
+
+        // Cherche, autour de n'importe quel point, le secteur angulaire (formé par deux
+        // arêtes consécutives) le plus proche de la position donnée.
+        function findSectorAt(pos) {
+            const points = canvas.querySelectorAll('.point');
+            let closestVertex = null;
+            let closestDist = Infinity;
+            let closestDx = 0;
+            let closestDy = 0;
+
+            points.forEach((vertex) => {
+                const center = pointCenter(vertex);
+                const dx = pos.x - center.x;
+                const dy = pos.y - center.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist <= ANGLE_PREVIEW_RADIUS && dist < closestDist) {
+                    closestDist = dist;
+                    closestVertex = vertex;
+                    closestDx = dx;
+                    closestDy = dy;
+                }
+            });
+
+            if (!closestVertex) return null;
+
+            const neighbors = getSortedNeighbors(closestVertex);
+            const n = neighbors.length;
+            if (n < 2) return null;
+
+            const center = pointCenter(closestVertex);
+            const posAngle = normalizeAngle(Math.atan2(closestDy, closestDx));
+            for (let i = 0; i < n; i++) {
+                const from = neighbors[i];
+                const to = neighbors[(i + 1) % n];
+                const a1 = normalizeAngle(angleTo(center, from));
+                const a2 = normalizeAngle(angleTo(center, to));
+                const span = normalizeAngle(a2 - a1);
+                const rel = normalizeAngle(posAngle - a1);
+                if (rel <= span) {
+                    return { vertex: closestVertex, from, to };
+                }
+            }
+            return null;
+        }
+
+        function sectorsEqual(a, b) {
+            return a && b && a.vertex === b.vertex && a.from === b.from && a.to === b.to;
+        }
+
+        function updateHoverPreview(sector) {
+            if (!sector) {
+                clearHoverPreview();
+                return;
+            }
+            const filled = hasAngleFill(sector.vertex, sector.from, sector.to);
+            if (sectorsEqual(hoverSector, sector) && hoverPreviewPath) {
+                hoverPreviewPath.classList.toggle('angle-preview-remove', filled);
+                return;
+            }
+
+            clearHoverPreview();
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const path = document.createElementNS(svgNS, 'path');
+            path.classList.add('angle-preview');
+            if (filled) path.classList.add('angle-preview-remove');
+            path.setAttribute('d', sectorPathD(sector.vertex, sector.from, sector.to, ANGLE_PREVIEW_RADIUS));
+            previewsLayer.appendChild(path);
+            hoverPreviewPath = path;
+            hoverSector = sector;
+        }
+
+        // e.altKey est fiable sur les évènements souris (contrairement à keydown/keyup
+        // pour la touche Alt seule, qui ne se déclenchent pas toujours selon le navigateur).
+        window.addEventListener('mousemove', (e) => {
+            if (!e.altKey) {
+                clearHoverPreview();
+                return;
+            }
+            updateHoverPreview(findSectorAt(screenToWorld(e.clientX, e.clientY)));
+        });
+
+        // Capturé avant tout autre gestionnaire : Alt + clic sur un secteur survolé
+        // remplit/vide cet angle, sans créer de point, déplacer, sélectionner,
+        // recolorer une figure ou supprimer une ligne.
+        window.addEventListener(
+            'mousedown',
+            (e) => {
+                if (!e.altKey) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const sector = findSectorAt(screenToWorld(e.clientX, e.clientY));
+                if (!sector) return;
+                const existing = angleFills.find(
+                    (f) => f.vertex === sector.vertex && f.p1 === sector.from && f.p2 === sector.to
+                );
+                if (existing) {
+                    removeAngleFill(existing);
+                } else {
+                    createAngleFill(sector.vertex, sector.from, sector.to);
+                }
+                updateHoverPreview(sector);
+            },
+            true
+        );
+
+        // Le navigateur émet quand même un évènement "click" après le mousedown/mouseup
+        // intercepté ci-dessus (stopPropagation sur mousedown ne l'empêche pas) : on le
+        // bloque aussi pour éviter qu'il supprime une ligne ou recolore une figure.
+        window.addEventListener(
+            'click',
+            (e) => {
+                if (!e.altKey) return;
+                e.preventDefault();
+                e.stopPropagation();
+            },
+            true
+        );
+
+        function faceUsesEdge(face, p1, p2) {
+            const n = face.length;
+            for (let i = 0; i < n; i++) {
+                const a = face[i];
+                const b = face[(i + 1) % n];
+                if ((a === p1 && b === p2) || (a === p2 && b === p1)) return true;
+            }
+            return false;
+        }
+
+        function sameFace(a, b) {
+            if (a.length !== b.length) return false;
+            const setB = new Set(b);
+            return a.every((p) => setB.has(p));
+        }
+
+        function updateFillPolygon(fill) {
+            const pts = fill.points
+                .map((p) => {
+                    const c = pointCenter(p);
+                    return c.x + ',' + c.y;
+                })
+                .join(' ');
+            fill.polygon.setAttribute('points', pts);
+        }
+
+        function updateFillsForPoint(point) {
+            fills.forEach((fill) => {
+                if (fill.points.includes(point)) updateFillPolygon(fill);
+            });
+        }
+
+        function removeFill(fill) {
+            fill.polygon.remove();
+            const index = fills.indexOf(fill);
+            if (index !== -1) fills.splice(index, 1);
+            scheduleSave();
+        }
+
+        function removeFillsForPoint(point) {
+            fills.slice().forEach((fill) => {
+                if (fill.points.includes(point)) removeFill(fill);
+            });
+        }
+
+        function createOrUpdateFill(face, color) {
+            const existing = fills.find((f) => sameFace(f.points, face));
+            if (existing) {
+                existing.points = face;
+                existing.polygon.setAttribute('fill', color);
+                updateFillPolygon(existing);
+                scheduleSave();
+                return;
+            }
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const polygon = document.createElementNS(svgNS, 'polygon');
+            polygon.classList.add('fill-shape');
+            polygon.setAttribute('fill', color);
+
+            const fill = { points: face, polygon };
+
+            polygon.addEventListener('mousedown', (e) => e.stopPropagation());
+            polygon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentFillColor === 'none') {
+                    removeFill(fill);
+                } else {
+                    polygon.setAttribute('fill', currentFillColor);
+                    scheduleSave();
+                }
+            });
+
+            fillsLayer.appendChild(polygon);
+            fills.push(fill);
+            updateFillPolygon(fill);
+            scheduleSave();
+        }
+
+        function buildAdjacency() {
+            const adjacency = new Map();
+            function ensure(p) {
+                if (!adjacency.has(p)) adjacency.set(p, []);
+                return adjacency.get(p);
+            }
+            lines.forEach((line) => {
+                ensure(line.p1).push(line.p2);
+                ensure(line.p2).push(line.p1);
+            });
+            adjacency.forEach((neighbors, p) => {
+                const center = pointCenter(p);
+                neighbors.sort((a, b) => {
+                    const ca = pointCenter(a);
+                    const cb = pointCenter(b);
+                    return (
+                        Math.atan2(ca.y - center.y, ca.x - center.x) -
+                        Math.atan2(cb.y - center.y, cb.x - center.x)
+                    );
+                });
+            });
+            return adjacency;
+        }
+
+        function computeFaces() {
+            const adjacency = buildAdjacency();
+            const visited = new Set();
+            const faces = [];
+            const edgeKey = (u, v) => u.dataset.pid + '>' + v.dataset.pid;
+
+            lines.forEach((line) => {
+                [[line.p1, line.p2], [line.p2, line.p1]].forEach(([u, v]) => {
+                    if (visited.has(edgeKey(u, v))) return;
+                    const face = [u];
+                    let curU = u;
+                    let curV = v;
+                    let guard = 0;
+                    while (guard++ < 2000) {
+                        visited.add(edgeKey(curU, curV));
+                        face.push(curV);
+                        const neighbors = adjacency.get(curV);
+                        const idx = neighbors.indexOf(curU);
+                        const nextV = neighbors[(idx + 1) % neighbors.length];
+                        if (curV === u && nextV === v) break;
+                        curU = curV;
+                        curV = nextV;
+                    }
+                    face.pop();
+                    if (face.length >= 3) faces.push(face);
+                });
+            });
+
+            return faces;
+        }
+
+        function pointInPolygon(point, vertices) {
+            let inside = false;
+            for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                const xi = vertices[i].x;
+                const yi = vertices[i].y;
+                const xj = vertices[j].x;
+                const yj = vertices[j].y;
+                const intersect =
+                    yi > point.y !== yj > point.y &&
+                    point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi;
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function polygonArea(vertices) {
+            let area = 0;
+            for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                area += (vertices[j].x + vertices[i].x) * (vertices[j].y - vertices[i].y);
+            }
+            return Math.abs(area / 2);
+        }
+
+        function tryFillFaceAt(click) {
+            const faces = computeFaces();
+            let best = null;
+            let bestArea = Infinity;
+            faces.forEach((face) => {
+                const vertices = face.map((p) => pointCenter(p));
+                if (pointInPolygon(click, vertices)) {
+                    const area = polygonArea(vertices);
+                    if (area < bestArea) {
+                        bestArea = area;
+                        best = face;
+                    }
+                }
+            });
+            if (!best || currentFillColor === 'none') return false;
+            createOrUpdateFill(best, currentFillColor);
+            return true;
+        }
+
+        function removeLine(line) {
+            line.visible.remove();
+            line.hit.remove();
+            const index = lines.indexOf(line);
+            if (index !== -1) lines.splice(index, 1);
+            fills.slice().forEach((fill) => {
+                if (faceUsesEdge(fill.points, line.p1, line.p2)) removeFill(fill);
+            });
+            updateAngleFillsForPoint(line.p1);
+            updateAngleFillsForPoint(line.p2);
+            scheduleSave();
+        }
+
+        function removeLinesForPoint(point) {
+            lines.slice().forEach((line) => {
+                if (line.p1 === point || line.p2 === point) removeLine(line);
+            });
+        }
+
+        function createLine(p1, p2) {
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const visible = document.createElementNS(svgNS, 'line');
+            visible.classList.add('line-visible');
+            const hit = document.createElementNS(svgNS, 'line');
+            hit.classList.add('line-hit');
+
+            const line = { p1, p2, visible, hit };
+
+            hit.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeLine(line);
+            });
+
+            linesLayer.appendChild(visible);
+            linesLayer.appendChild(hit);
+            lines.push(line);
+            updateLine(line);
+            updateAngleFillsForPoint(p1);
+            updateAngleFillsForPoint(p2);
+            scheduleSave();
+        }
+
+        function autoConnectPoint(point) {
+            if (!autoConnectEnabled) return;
+            const center = pointCenter(point);
+            const others = Array.from(canvas.querySelectorAll('.point')).filter((p) => p !== point);
+            if (others.length === 0) return;
+
+            let nearest = others[0];
+            let nearestDist = Math.hypot(pointCenter(nearest).x - center.x, pointCenter(nearest).y - center.y);
+            for (let i = 1; i < others.length; i++) {
+                const c = pointCenter(others[i]);
+                const dist = Math.hypot(c.x - center.x, c.y - center.y);
+                if (dist < nearestDist) {
+                    nearest = others[i];
+                    nearestDist = dist;
+                }
+            }
+
+            createLine(point, nearest);
+        }
+
+        function selectPointForLine(point) {
+            if (!selectedPoint) {
+                selectedPoint = point;
+                point.classList.add('selected');
+            } else if (selectedPoint === point) {
+                point.classList.remove('selected');
+                selectedPoint = null;
+            } else {
+                createLine(selectedPoint, point);
+                selectedPoint.classList.remove('selected');
+                selectedPoint = null;
+            }
+        }
+
+        function removePoint(point) {
+            if (selectedPoint === point) selectedPoint = null;
+            removeFillsForPoint(point);
+            removeAngleFillsForPoint(point);
+            removeLinesForPoint(point);
+            point.remove();
+            scheduleSave();
+        }
+
+        function createPoint(x, y, pid) {
+            const point = document.createElement('div');
+            point.className = 'point';
+            if (pid !== undefined && pid !== null) {
+                point.dataset.pid = pid;
+                const numericPid = parseInt(pid, 10);
+                if (!Number.isNaN(numericPid) && numericPid >= pointIdCounter) pointIdCounter = numericPid + 1;
+            } else {
+                point.dataset.pid = pointIdCounter++;
+            }
+            point.style.left = x + 'px';
+            point.style.top = y + 'px';
+
+            point.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                if (e.altKey || e.button !== 0) return;
+                draggedPoint = point;
+                didDrag = false;
+                const world = screenToWorld(e.clientX, e.clientY);
+                const center = pointCenter(point);
+                dragOffsetX = world.x - center.x;
+                dragOffsetY = world.y - center.y;
+            });
+
+            point.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                removePoint(point);
+            });
+
+            point.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                removePoint(point);
+            });
+
+            worldEl.appendChild(point);
+            scheduleSave();
+            return point;
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.altKey || e.button !== 0) return;
+            if (e.target !== canvas && e.target !== worldEl) return;
+            const world = screenToWorld(e.clientX, e.clientY);
+            const filled = tryFillFaceAt(world);
+            if (filled) return;
+            const point = createPoint(world.x, world.y);
+            autoConnectPoint(point);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!draggedPoint) return;
+            didDrag = true;
+            const world = screenToWorld(e.clientX, e.clientY);
+            const x = world.x - dragOffsetX;
+            const y = world.y - dragOffsetY;
+            draggedPoint.style.left = x + 'px';
+            draggedPoint.style.top = y + 'px';
+            updateLinesForPoint(draggedPoint);
+            updateFillsForPoint(draggedPoint);
+            updateAngleFillsForPoint(draggedPoint);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (draggedPoint && !didDrag) {
+                selectPointForLine(draggedPoint);
+            }
+            if (draggedPoint) scheduleSave();
+            draggedPoint = null;
+        });
+
+        canvas.addEventListener('contextmenu', (e) => {
+            if (e.target === canvas || e.target === worldEl) {
+                e.preventDefault();
+            }
+        });
+
+        // Molette : zoom centré sur le curseur.
+        canvas.addEventListener(
+            'wheel',
+            (e) => {
+                e.preventDefault();
+                const zoomIntensity = 0.0015;
+                const factor = Math.exp(-e.deltaY * zoomIntensity);
+                const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, viewScale * factor));
+                const world = screenToWorld(e.clientX, e.clientY);
+                viewScale = newScale;
+                viewOffsetX = e.clientX - world.x * viewScale;
+                viewOffsetY = e.clientY - world.y * viewScale;
+                applyTransform();
+                scheduleSave();
+            },
+            { passive: false }
+        );
+
+        // Clic molette + glisser : déplacer la vue (pan).
+        let isPanning = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panOriginX = 0;
+        let panOriginY = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button !== 1) return;
+            e.preventDefault();
+            isPanning = true;
+            panStartX = e.clientX;
+            panStartY = e.clientY;
+            panOriginX = viewOffsetX;
+            panOriginY = viewOffsetY;
+            canvas.classList.add('panning');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            viewOffsetX = panOriginX + (e.clientX - panStartX);
+            viewOffsetY = panOriginY + (e.clientY - panStartY);
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (e.button === 1) {
+                isPanning = false;
+                canvas.classList.remove('panning');
+                scheduleSave();
+            }
+        });
+
+        document.getElementById('resetView').addEventListener('click', () => {
+            viewScale = 1;
+            viewOffsetX = 0;
+            viewOffsetY = 0;
+            applyTransform();
+            scheduleSave();
+        });
+
+        document.querySelectorAll('.swatch').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.swatch').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFillColor = btn.dataset.color;
+                scheduleSave();
+            });
+        });
+
+        const customColorInput = document.getElementById('customColor');
+        customColorInput.addEventListener('input', () => {
+            currentFillColor = customColorInput.value;
+            document.querySelectorAll('.swatch').forEach((b) => b.classList.remove('active'));
+            scheduleSave();
+        });
+
+        document.getElementById('togglePoints').addEventListener('change', (e) => {
+            canvas.classList.toggle('hide-points', !e.target.checked);
+            scheduleSave();
+        });
+
+        document.getElementById('autoConnect').addEventListener('change', (e) => {
+            autoConnectEnabled = e.target.checked;
+            scheduleSave();
+        });
+
+        document.getElementById('angleWidth').addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            if (!Number.isFinite(value) || value <= 0) return;
+            ANGLE_FILL_RADIUS = value;
+            angleFills.forEach((fill) => {
+                fill.path.setAttribute('d', sectorPathD(fill.vertex, fill.p1, fill.p2, ANGLE_FILL_RADIUS));
+            });
+            scheduleSave();
+        });
+
+        document.getElementById('fillOpacity').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--fill-opacity', e.target.value / 100);
+            scheduleSave();
+        });
+
+        // --- Image de référence ---
+
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imageToolbarGroup = document.getElementById('imageToolbarGroup');
+        const imageLockedInput = document.getElementById('imageLocked');
+        const imageOpacityInput = document.getElementById('imageOpacity');
+        const imageScaleInput = document.getElementById('imageScale');
+
+        function setImageSrc(src, worldX, worldY, scalePct, opacityPct, locked) {
+            refImageEl.onload = () => {
+                if (worldX === undefined || worldY === undefined) {
+                    const center = screenToWorld(window.innerWidth / 2, window.innerHeight / 2);
+                    imageWorldX = center.x - (refImageEl.naturalWidth / 2) * (imageScalePct / 100);
+                    imageWorldY = center.y - (refImageEl.naturalHeight / 2) * (imageScalePct / 100);
+                } else {
+                    imageWorldX = worldX;
+                    imageWorldY = worldY;
+                }
+                applyImageTransform();
+                scheduleSave();
+            };
+            refImageEl.src = src;
+            refImageEl.style.display = 'block';
+            imageScalePct = scalePct !== undefined ? scalePct : 100;
+            imageOpacityInput.value = opacityPct !== undefined ? opacityPct : 50;
+            refImageEl.style.opacity = imageOpacityInput.value / 100;
+            imageScaleInput.value = imageScalePct;
+            imageLocked = locked !== undefined ? locked : true;
+            imageLockedInput.checked = imageLocked;
+            refImageEl.classList.toggle('unlocked', !imageLocked);
+            imageToolbarGroup.style.display = 'flex';
+        }
+
+        imageUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => setImageSrc(reader.result);
+            reader.readAsDataURL(file);
+        });
+
+        imageLockedInput.addEventListener('change', (e) => {
+            imageLocked = e.target.checked;
+            refImageEl.classList.toggle('unlocked', !imageLocked);
+            scheduleSave();
+        });
+
+        imageOpacityInput.addEventListener('input', (e) => {
+            refImageEl.style.opacity = e.target.value / 100;
+            scheduleSave();
+        });
+
+        imageScaleInput.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            if (!Number.isFinite(value) || value <= 0) return;
+            imageScalePct = value;
+            applyImageTransform();
+            scheduleSave();
+        });
+
+        document.getElementById('removeImage').addEventListener('click', () => {
+            refImageEl.removeAttribute('src');
+            refImageEl.style.display = 'none';
+            imageToolbarGroup.style.display = 'none';
+            scheduleSave();
+        });
+
+        refImageEl.addEventListener('mousedown', (e) => {
+            if (imageLocked || e.button !== 0) return;
+            e.stopPropagation();
+            e.preventDefault();
+            draggingImage = true;
+            const world = screenToWorld(e.clientX, e.clientY);
+            imageDragOffsetX = world.x - imageWorldX;
+            imageDragOffsetY = world.y - imageWorldY;
+            refImageEl.classList.add('dragging');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!draggingImage) return;
+            const world = screenToWorld(e.clientX, e.clientY);
+            imageWorldX = world.x - imageDragOffsetX;
+            imageWorldY = world.y - imageDragOffsetY;
+            applyImageTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (draggingImage) {
+                draggingImage = false;
+                refImageEl.classList.remove('dragging');
+                scheduleSave();
+            }
+        });
+
+        // --- Sauvegarde / restauration ---
+
+        function serializeState() {
+            const pid = (p) => p.dataset.pid;
+            const activeSwatch = document.querySelector('.swatch.active');
+
+            return {
+                version: 1,
+                points: Array.from(canvas.querySelectorAll('.point')).map((p) => ({
+                    id: pid(p),
+                    x: parseFloat(p.style.left),
+                    y: parseFloat(p.style.top)
+                })),
+                lines: lines.map((l) => ({ p1: pid(l.p1), p2: pid(l.p2) })),
+                fills: fills.map((f) => ({
+                    points: f.points.map(pid),
+                    color: f.polygon.getAttribute('fill')
+                })),
+                angleFills: angleFills.map((f) => ({
+                    vertex: pid(f.vertex),
+                    p1: pid(f.p1),
+                    p2: pid(f.p2)
+                })),
+                settings: {
+                    angleFillRadius: ANGLE_FILL_RADIUS,
+                    showPoints: document.getElementById('togglePoints').checked,
+                    autoConnect: autoConnectEnabled,
+                    currentFillColor,
+                    customColor: customColorInput.value,
+                    activeSwatchColor: activeSwatch ? activeSwatch.dataset.color : null,
+                    fillOpacity: document.getElementById('fillOpacity').value,
+                    view: { scale: viewScale, offsetX: viewOffsetX, offsetY: viewOffsetY }
+                },
+                image: refImageEl.getAttribute('src')
+                    ? {
+                          src: refImageEl.getAttribute('src'),
+                          x: imageWorldX,
+                          y: imageWorldY,
+                          scale: imageScalePct,
+                          opacity: imageOpacityInput.value,
+                          locked: imageLocked
+                      }
+                    : null
+            };
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState()));
+            } catch (err) {
+                // Stockage indisponible ou plein : on ignore silencieusement.
+            }
+        }
+
+        function scheduleSave() {
+            if (suppressSave) return;
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveState, 150);
+        }
+
+        function loadState() {
+            let raw;
+            try {
+                raw = localStorage.getItem(STORAGE_KEY);
+            } catch (err) {
+                return;
+            }
+            if (!raw) return;
+
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (err) {
+                return;
+            }
+
+            suppressSave = true;
+            try {
+                const pointMap = new Map();
+                (data.points || []).forEach((p) => {
+                    const el = createPoint(p.x, p.y, p.id);
+                    pointMap.set(String(p.id), el);
+                });
+
+                (data.lines || []).forEach((l) => {
+                    const p1 = pointMap.get(String(l.p1));
+                    const p2 = pointMap.get(String(l.p2));
+                    if (p1 && p2) createLine(p1, p2);
+                });
+
+                (data.fills || []).forEach((f) => {
+                    const face = (f.points || []).map((id) => pointMap.get(String(id))).filter(Boolean);
+                    if (face.length >= 3) createOrUpdateFill(face, f.color);
+                });
+
+                (data.angleFills || []).forEach((f) => {
+                    const vertex = pointMap.get(String(f.vertex));
+                    const from = pointMap.get(String(f.p1));
+                    const to = pointMap.get(String(f.p2));
+                    if (vertex && from && to) createAngleFill(vertex, from, to);
+                });
+
+                const settings = data.settings || {};
+
+                if (typeof settings.angleFillRadius === 'number' && settings.angleFillRadius > 0) {
+                    ANGLE_FILL_RADIUS = settings.angleFillRadius;
+                    document.getElementById('angleWidth').value = ANGLE_FILL_RADIUS;
+                    angleFills.forEach((fill) => {
+                        fill.path.setAttribute('d', sectorPathD(fill.vertex, fill.p1, fill.p2, ANGLE_FILL_RADIUS));
+                    });
+                }
+
+                if (typeof settings.showPoints === 'boolean') {
+                    document.getElementById('togglePoints').checked = settings.showPoints;
+                    canvas.classList.toggle('hide-points', !settings.showPoints);
+                }
+
+                if (typeof settings.autoConnect === 'boolean') {
+                    autoConnectEnabled = settings.autoConnect;
+                    document.getElementById('autoConnect').checked = autoConnectEnabled;
+                }
+
+                if (settings.currentFillColor) currentFillColor = settings.currentFillColor;
+                if (settings.customColor) customColorInput.value = settings.customColor;
+
+                document.querySelectorAll('.swatch').forEach((b) => b.classList.remove('active'));
+                if (settings.activeSwatchColor) {
+                    const match = Array.from(document.querySelectorAll('.swatch')).find(
+                        (b) => b.dataset.color === settings.activeSwatchColor
+                    );
+                    if (match) match.classList.add('active');
+                }
+
+                if (settings.view) {
+                    viewScale = settings.view.scale || 1;
+                    viewOffsetX = settings.view.offsetX || 0;
+                    viewOffsetY = settings.view.offsetY || 0;
+                }
+
+                if (typeof settings.fillOpacity !== 'undefined') {
+                    document.getElementById('fillOpacity').value = settings.fillOpacity;
+                    document.documentElement.style.setProperty('--fill-opacity', settings.fillOpacity / 100);
+                }
+
+                if (data.image && data.image.src) {
+                    setImageSrc(
+                        data.image.src,
+                        data.image.x,
+                        data.image.y,
+                        data.image.scale,
+                        data.image.opacity,
+                        data.image.locked
+                    );
+                }
+            } finally {
+                suppressSave = false;
+            }
+        }
+
+        window.addEventListener('beforeunload', saveState);
+
+        loadState();
+        applyTransform();
+    </script>
+</body>
+</html>

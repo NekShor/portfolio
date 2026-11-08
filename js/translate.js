@@ -6,6 +6,12 @@ var englishSpeakingCountries = new Set([
     'WS', 'ZA', 'ZM', 'ZW', 'GB'
 ]);
 
+var frenchSpeakingCountries = new Set([
+    'FR', 'BE', 'CH', 'CA', 'LU', 'MC', 'BJ', 'BF', 'BI', 'CM', 'CF', 'TD',
+    'KM', 'CG', 'CD', 'CI', 'DJ', 'GA', 'GN', 'GQ', 'HT', 'MG', 'ML', 'NE',
+    'RW', 'SN', 'SC', 'TG', 'VU'
+]);
+
 window.addEventListener('load', () => {
     var params = new URLSearchParams(window.location.search);
     var requestedLang = params.get('lang');
@@ -23,7 +29,14 @@ window.addEventListener('load', () => {
     }
 
     detectLanguageByCountry().then((countryCode) => {
-        if (countryCode && !englishSpeakingCountries.has(countryCode)) {
+        console.log(`Detected country code: ${countryCode}`);
+        if (countryCode && frenchSpeakingCountries.has(countryCode)) {
+            localStorage.setItem('lang', 'fr');
+            translate();
+            return;
+        }
+
+        if (countryCode && englishSpeakingCountries.has(countryCode)) {
             var englishUrl = new URL(window.location.href);
             englishUrl.searchParams.set('lang', 'en');
             window.location.replace(englishUrl.toString());
