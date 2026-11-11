@@ -451,16 +451,14 @@
             const c = pointCenter(vertex);
             const a1 = normalizeAngle(angleTo(c, from));
             const a2 = normalizeAngle(angleTo(c, to));
-            const span = normalizeAngle(a2 - a1);
             const x1 = c.x + radius * Math.cos(a1);
             const y1 = c.y + radius * Math.sin(a1);
             const x2 = c.x + radius * Math.cos(a2);
             const y2 = c.y + radius * Math.sin(a2);
-            const largeArc = span > Math.PI ? 1 : 0;
             return (
                 'M ' + c.x + ' ' + c.y +
                 ' L ' + x1 + ' ' + y1 +
-                ' A ' + radius + ' ' + radius + ' 0 ' + largeArc + ' 1 ' + x2 + ' ' + y2 +
+                ' L ' + x2 + ' ' + y2 +
                 ' Z'
             );
         }
