@@ -42,7 +42,8 @@
         #fills,
         #lines,
         #angles,
-        #anglePreviews {
+        #anglePreviews,
+        #texts {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -139,6 +140,22 @@
         .point.selected {
             background: #2a9d8f;
             box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.35);
+        }
+
+        .point-text {
+            pointer-events: all;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            fill: #000;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            user-select: none;
+        }
+
+        .point-text:hover {
+            text-decoration: underline;
         }
 
         #hint {
@@ -257,8 +274,9 @@
             <svg id="lines"></svg>
             <svg id="angles"></svg>
             <svg id="anglePreviews"></svg>
+            <svg id="texts"></svg>
         </div>
-        <div id="hint">Clic sur le vide : ajouter un point (relie automatiquement aux points proches) &nbsp;|&nbsp; Glisser : déplacer &nbsp;|&nbsp; Clic sur 2 points : relier &nbsp;|&nbsp; Clic sur une figure fermée : la remplir &nbsp;|&nbsp; Clic sur une ligne : la supprimer &nbsp;|&nbsp; Maintenir Alt près d'un point : affiche l'angle survolé (gris = à remplir, rouge = à vider), cliquer pour basculer &nbsp;|&nbsp; Double-clic / clic droit sur un point : le supprimer &nbsp;|&nbsp; Molette : zoom &nbsp;|&nbsp; Clic molette + glisser : déplacer la vue</div>
+        <div id="hint">Clic sur le vide : ajouter un point (relie automatiquement aux points proches) &nbsp;|&nbsp; Glisser : déplacer &nbsp;|&nbsp; Ctrl+Clic sur un point : éditer le texte &nbsp;|&nbsp; Clic sur 2 points : relier &nbsp;|&nbsp; Clic sur une figure fermée : la remplir &nbsp;|&nbsp; Clic sur une ligne : la supprimer &nbsp;|&nbsp; Maintenir Alt près d'un point : affiche l'angle survolé (gris = à remplir, rouge = à vider), cliquer pour basculer &nbsp;|&nbsp; Double-clic / clic droit sur un point : le supprimer &nbsp;|&nbsp; Molette : zoom &nbsp;|&nbsp; Clic molette + glisser : déplacer la vue</div>
     </div>
 
     <div id="toolbar">
@@ -372,6 +390,7 @@
         const lines = [];
         const fills = [];
         const angleFills = [];
+        const pointTexts = new Map();
         let hoverPreviewPath = null;
         let hoverSector = null;
 
@@ -896,6 +915,7 @@
             removeFillsForPoint(point);
             removeAngleFillsForPoint(point);
             removeLinesForPoint(point);
+            removePointTexts(point);
             point.remove();
             scheduleSave();
         }
@@ -929,6 +949,14 @@
                 removePoint(point);
             });
 
+            point.addEventListener('click', (e) => {
+                if (e.button === 2) return;
+                if (e.detail === 1 && e.ctrlKey && !e.altKey && !didDrag) {
+                    e.stopPropagation();
+                    editPointText(point);
+                }
+            });
+
             point.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -938,6 +966,70 @@
             worldEl.appendChild(point);
             scheduleSave();
             return point;
+        }
+
+        function getPointText(point) {
+            const pid = point.dataset.pid;
+            return pointTexts.get(pid) || '';
+        }
+
+        function setPointText(point, text) {
+            const pid = point.dataset.pid;
+            const textsLayer = document.getElementById('texts');
+            
+            if (text.trim() === '') {
+                pointTexts.delete(pid);
+                const existingText = Array.from(textsLayer.querySelectorAll('.point-text')).find(
+                    t => t.dataset.pid === pid
+                );
+                if (existingText) existingText.remove();
+            } else {
+                pointTexts.set(pid, text);
+                let textEl = Array.from(textsLayer.querySelectorAll('.point-text')).find(
+                    t => t.dataset.pid === pid
+                );
+                if (!textEl) {
+                    const svgNS = 'http://www.w3.org/2000/svg';
+                    textEl = document.createElementNS(svgNS, 'text');
+                    textEl.classList.add('point-text');
+                    textEl.dataset.pid = pid;
+                    textEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editPointText(point);
+                    });
+                    textsLayer.appendChild(textEl);
+                }
+                const center = pointCenter(point);
+                textEl.setAttribute('x', center.x);
+                textEl.setAttribute('y', center.y - 15);
+                textEl.textContent = text;
+            }
+            scheduleSave();
+        }
+
+        function editPointText(point) {
+            const currentText = getPointText(point);
+            const newText = prompt('Texte pour ce point:', currentText);
+            if (newText !== null) {
+                setPointText(point, newText);
+            }
+        }
+
+        function updatePointTexts(point) {
+            const pid = point.dataset.pid;
+            const textEl = document.querySelector(`.point-text[data-pid="${pid}"]`);
+            if (textEl) {
+                const center = pointCenter(point);
+                textEl.setAttribute('x', center.x);
+                textEl.setAttribute('y', center.y - 15);
+            }
+        }
+
+        function removePointTexts(point) {
+            const pid = point.dataset.pid;
+            pointTexts.delete(pid);
+            const textEl = document.querySelector(`.point-text[data-pid="${pid}"]`);
+            if (textEl) textEl.remove();
         }
 
         canvas.addEventListener('mousedown', (e) => {
@@ -961,6 +1053,7 @@
             updateLinesForPoint(draggedPoint);
             updateFillsForPoint(draggedPoint);
             updateAngleFillsForPoint(draggedPoint);
+            updatePointTexts(draggedPoint);
         });
 
         window.addEventListener('mouseup', () => {
@@ -1182,7 +1275,8 @@
                 points: Array.from(canvas.querySelectorAll('.point')).map((p) => ({
                     id: pid(p),
                     x: parseFloat(p.style.left),
-                    y: parseFloat(p.style.top)
+                    y: parseFloat(p.style.top),
+                    text: getPointText(p)
                 })),
                 lines: lines.map((l) => ({ p1: pid(l.p1), p2: pid(l.p2) })),
                 fills: fills.map((f) => ({
@@ -1253,6 +1347,7 @@
                 (data.points || []).forEach((p) => {
                     const el = createPoint(p.x, p.y, p.id);
                     pointMap.set(String(p.id), el);
+                    if (p.text) setPointText(el, p.text);
                 });
 
                 (data.lines || []).forEach((l) => {
